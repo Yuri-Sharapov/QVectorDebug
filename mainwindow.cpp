@@ -26,13 +26,18 @@ MainWindow::MainWindow(QWidget *parent)
     m_rxData.clear();
     m_rxRawData.clear();
     m_rxRawData.reserve(1024 * 10);
-
 }
 
 MainWindow::~MainWindow()
 {
     delete m_pUi;
     delete m_pChart;
+    delete m_pStatus;
+
+    if (m_pSerial->isOpen())
+        m_pSerial->close();
+
+    delete m_pSerial;
 }
 
 void MainWindow::on_btnConnect_clicked()
@@ -231,9 +236,8 @@ void MainWindow::protocolParseData(const QByteArray &data)
                     {
 
                         m_timerNs_1 = _chartVar.timeNs;
-                        //m_pChart->appendData(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
-                        //m_pChart->updateChart();
-
+                        m_pChart->appendData(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
+                        m_pChart->updateChart();
                     }
                 }
                 else

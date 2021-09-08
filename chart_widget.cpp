@@ -28,9 +28,6 @@ void ChartWidget::appendData(qint64 time, int16_t data0, int16_t data1, int16_t 
     this->graph(1)->addData(time/1000000U, data1);
     this->graph(2)->addData(time/1000000U, data2);
     this->graph(3)->addData(time/1000000U, data3);
-
-    //this->rescaleAxes();
-    //this->replot();
 }
 
 void ChartWidget::appendData(qint64 time, uint16_t data0, uint16_t data1, uint16_t data2, uint16_t data3)
@@ -40,9 +37,6 @@ void ChartWidget::appendData(qint64 time, uint16_t data0, uint16_t data1, uint16
     this->graph(1)->addData(time/1000000U, data1);
     this->graph(2)->addData(time/1000000U, data2);
     this->graph(3)->addData(time/1000000U, data3);
-
-    //this->rescaleAxes();
-    //this->replot();
 }
 
 void ChartWidget::startChart()
