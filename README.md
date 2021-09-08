@@ -1,0 +1,2 @@
+# QVectorDebug
+Fast Chart Plotter
