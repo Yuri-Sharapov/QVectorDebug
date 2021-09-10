@@ -1,3 +1,20 @@
+/*
+ * This file is part of the QVectorDebug (https://github.com/Yuri-Sharapov/QVectorDebug).
+ * Copyright (c) 2015 Liviu Ionescu.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -16,16 +33,26 @@ MainWindow::MainWindow(QWidget *parent)
     m_pUi->cbEnabled_3->setChecked(true);
     m_pUi->cbEnabled_4->setChecked(true);
 
-    m_pSerial = new QSerialPort(this);
+    //m_pSerial = new QSerialPort(this);
+    m_pPort = new Port;
+
+    QThread *threadNew = new QThread;
+    m_pPort->moveToThread(threadNew);//помешаем класс  в поток
+    m_pPort->m_port.moveToThread(threadNew);//Помещаем сам порт в поток
+
+    connect(threadNew, SIGNAL(started()), m_pPort, SLOT(process()));//Переназначения метода run
+    connect(m_pPort, SIGNAL(finished()), threadNew, SLOT(quit()));//Переназначение метода выход
+
+    connect(m_pPort, &Port::updatePlot, this, &MainWindow::on_PortUpdatePlot);
+
+    threadNew->start();
 
     serialSetup();
 
     m_pStatus = new QLabel(this);
     m_pUi->statusbar->addWidget(m_pStatus);
 
-    m_rxData.clear();
-    m_rxRawData.clear();
-    m_rxRawData.reserve(1024 * 10);
+
 }
 
 MainWindow::~MainWindow()
@@ -33,32 +60,26 @@ MainWindow::~MainWindow()
     delete m_pUi;
     delete m_pChart;
     delete m_pStatus;
+    delete m_pPort;
+}
 
-    if (m_pSerial->isOpen())
-        m_pSerial->close();
-
-    delete m_pSerial;
+void MainWindow::on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4)
+{
+    m_pChart->appendData(timeNs, var1, var2, var3, var4);
+    m_pChart->updateChart();
 }
 
 void MainWindow::on_btnConnect_clicked()
 {
-    if (m_pSerial->isOpen())
+    if (m_pPort->isOpenPort())
     {
         serialDisconnect();
-        m_pChart->startChart();
-        for(ChartVar var : m_rxRawData)
-        {
-            m_pChart->appendData(var.timeNs, var.data[0], var.data[1], var.data[2], var.data[3]);
-        }
-        m_pChart->updateChart();
+        openChart(m_pPort->getChartVars());
     }
     else
     {
         serialConnect();
-        m_timerNs.start();
-        m_timerNs_1 = 0;
         m_pChart->startChart();
-        m_rxRawData.clear();
     }
 }
 
@@ -106,12 +127,56 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionSave_triggered()
 {
+    if (m_pPort->getChartVars()->count() && !m_pPort->isOpenPort())
+    {
+        QDateTime currentDateTime = QDateTime::currentDateTime();
+        QString data = "QVector-";
+        data.append(currentDateTime.toString( "yy.dd.mm-hh.mm.ss" ));
 
+        QString nameFile = QFileDialog::getSaveFileName(this, tr("Save Log"), data,
+                                                            tr("File Name (*.vct);;C++ File (*.cpp *.h)"));
+            if (nameFile != "")
+            {
+                QFile file(nameFile);
+
+                if (file.open(QIODevice::ReadWrite))
+                {
+                    for (Port::ChartVar var : *m_pPort->getChartVars())
+                    {
+                        file.write(reinterpret_cast<char*>(&var), sizeof(Port::ChartVar));
+                    }
+                    file.flush();
+                    file.close();
+                }
+                else
+                {
+                    QMessageBox::critical(this, tr("Errore"), tr("Non posso salvare il file"));
+                    return;
+                }
+            }
+    }
 }
 
 void MainWindow::on_actionOpen_triggered()
 {
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open Vector file"), "./",tr("Vector Files (*.vct)"));
 
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly))
+        return;
+
+    QByteArray fileRaw = file.readAll();
+    file.close();
+
+    const Port::ChartVar *pVars = reinterpret_cast<Port::ChartVar*>(fileRaw.data());
+    QVector<Port::ChartVar> _vectVars;
+    _vectVars.clear();
+
+    for (size_t i = 0; i < fileRaw.size()/sizeof(Port::ChartVar); i++)
+    {
+        _vectVars.push_back(*pVars++);
+    }
+    openChart(&_vectVars);
 }
 
 void MainWindow::serialSetup(void)
@@ -121,7 +186,7 @@ void MainWindow::serialSetup(void)
     m_pUi->cbBaudrate->addItem(QStringLiteral("38400"), QSerialPort::Baud38400);
     m_pUi->cbBaudrate->addItem(QStringLiteral("57600"), QSerialPort::Baud57600);
     m_pUi->cbBaudrate->addItem(QStringLiteral("115200"), QSerialPort::Baud115200);
-    m_pUi->cbBaudrate->addItem(tr("Custom"));
+    //m_pUi->cbBaudrate->addItem(tr("Custom"));
     m_pUi->cbBaudrate->setCurrentIndex(0);
 
     m_pUi->cbBaudrate->setInsertPolicy(QComboBox::NoInsert);
@@ -150,40 +215,116 @@ void MainWindow::serialSetup(void)
 
 void MainWindow::serialConnect()
 {
-    m_pSerial->setPortName(m_pUi->cbPort->currentText());
-    m_pSerial->setBaudRate(m_pUi->cbBaudrate->itemData(m_pUi->cbBaudrate->currentIndex()).toInt());
-
-    m_rxData.clear();
-    // open serial port
-    if (m_pSerial->open(QIODevice::ReadWrite))
+    if (m_pPort->openPort(m_pUi->cbBaudrate->itemData(m_pUi->cbBaudrate->currentIndex()).toInt(),
+                        m_pUi->cbPort->currentText()))
     {
         showStatusMessage(tr("Connected to %1: %2").arg(m_pUi->cbPort->currentText())
                                                    .arg(m_pUi->cbBaudrate->currentText()));
         m_pUi->btnConnect->setText("Disconnect");
-
-        connect(m_pSerial, &QSerialPort::readyRead, this, &MainWindow::serialReadyRead);
     }
     else
     {
-        //QMessageBox::critical(this, tr("Error"), m_serial->errorString());
         showStatusMessage(tr("Open error"));
     }
 }
 
 void MainWindow::serialDisconnect()
 {
-    m_pSerial->close();
-    showStatusMessage(tr("Disconnected"));
+    m_pPort->closePort();
+    showStatusMessage(("Disconnected | Errors: " + QString::number(m_pPort->getErrorsCnt())));
     m_pUi->btnConnect->setText("Connect");
 }
 
-void MainWindow::serialReadyRead()
+void MainWindow::openChart(QVector<Port::ChartVar> *pVars)
 {
-    QByteArray array = m_pSerial->readAll();
+    m_pChart->startChart();
+    qint64 timePrevNs = 0;
+    for(Port::ChartVar var : *pVars)
+    {
+        if (timePrevNs == 0)
+        {
+            timePrevNs = var.timeNs;
+            m_pChart->appendData(var.timeNs, var.data[0], var.data[1], var.data[2], var.data[3]);
+        }
+        else
+        {
+            if (timePrevNs/1000000U != var.timeNs/1000000U)
+                m_pChart->appendData(var.timeNs, var.data[0], var.data[1], var.data[2], var.data[3]);
+
+            timePrevNs = var.timeNs;
+        }
+
+    }
+    m_pChart->updateChart();
+}
+
+void MainWindow::showStatusMessage(const QString &message)
+{
+    m_pStatus->setText(message);
+}
+
+void Port::PortReadyRead()
+{
+    QByteArray array = m_port.readAll();
     protocolParseData(array);
 }
 
-void MainWindow::protocolParseData(const QByteArray &data)
+Port::Port(QObject *parent) :
+    QObject(parent)
+{
+    m_rxData.clear();
+    m_rxRawData.clear();
+    m_rxRawData.reserve(1024 * 10);
+}
+
+Port::~Port()
+{
+    emit finished();
+}
+
+bool Port::openPort(long _baudrate, QString _name)
+{
+    m_port.setPortName(_name);
+    m_port.setBaudRate(_baudrate);
+    m_port.setStopBits(QSerialPort::StopBits::TwoStop);
+
+    if (m_port.open(QIODevice::ReadWrite))
+    {
+        connect(&m_port, &QSerialPort::readyRead, this, &Port::PortReadyRead);
+
+        m_timerNs.start();
+        m_timerNs_1 = 0;
+        m_rxRawData.clear();
+        m_port.clear();
+        m_errorsCnt = 0;
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void Port::closePort(void)
+{
+    m_port.close();
+}
+
+void Port::process()
+{
+
+}
+
+void Port::write(const QByteArray &data)
+{
+    if (m_port.isOpen())
+    {
+        m_port.write(data);
+    }
+}
+
+void Port::protocolParseData(const QByteArray &data)
 {
     enum protocolState_e
     {
@@ -236,15 +377,12 @@ void MainWindow::protocolParseData(const QByteArray &data)
                     {
 
                         m_timerNs_1 = _chartVar.timeNs;
-                        m_pChart->appendData(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
-                        m_pChart->updateChart();
+                        emit updatePlot(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
                     }
                 }
                 else
                 {
                     m_errorsCnt++;
-                    showStatusMessage("Errors Count: " + QString::number(m_errorsCnt));
-
                 }
                 _state = PROTOCOL_START;
             }
@@ -254,9 +392,4 @@ void MainWindow::protocolParseData(const QByteArray &data)
             break;
         }
     }
-}
-
-void MainWindow::showStatusMessage(const QString &message)
-{
-    m_pStatus->setText(message);
 }

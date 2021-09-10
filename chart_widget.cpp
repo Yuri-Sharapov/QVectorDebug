@@ -1,18 +1,34 @@
-#include "chart_widget.h"
+/*
+ * This file is part of the QVectorDebug (https://github.com/Yuri-Sharapov/QVectorDebug).
+ * Copyright (c) 2015 Liviu Ionescu.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include <math.h>
+#include "chart_widget.h"
 
 ChartWidget::ChartWidget(QCustomPlot *parent) :
     QCustomPlot(parent)
 {
     setupChart(this);
 
-    for (int i = 0; i < 100; i++)
+    /*for (int i = 0; i < 100; i++)
     {
         this->graph(0)->addData(i, sin(M_PI * i/10));
         this->graph(1)->addData(i, sin(M_PI * i/10 + M_PI/3));
         this->graph(2)->addData(i, sin(M_PI * i/10 + M_PI*2/3));
-    }
+    }*/
     this->rescaleAxes();
     this->replot();
 }
