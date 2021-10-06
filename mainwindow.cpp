@@ -33,7 +33,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_pUi->cbEnabled_3->setChecked(true);
     m_pUi->cbEnabled_4->setChecked(true);
 
-    //m_pSerial = new QSerialPort(this);
     m_pPort = new Port;
 
     QThread *threadNew = new QThread;
@@ -52,7 +51,14 @@ MainWindow::MainWindow(QWidget *parent)
     m_pStatus = new QLabel(this);
     m_pUi->statusbar->addWidget(m_pStatus);
 
-
+    // disable unused
+    m_pUi->btnSend->setEnabled(false);
+    m_pUi->cbSign_1->setEnabled(false);
+    m_pUi->cbSign_2->setEnabled(false);
+    m_pUi->cbSign_3->setEnabled(false);
+    m_pUi->cbSign_4->setEnabled(false);
+    m_pUi->leSendVar_1->setEnabled(false);
+    m_pUi->leSendVar_2->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
