@@ -43,8 +43,4 @@ private slots:
     void plotSelectionChanged();
     void plotDoubleClicked(QMouseEvent *event);
     void plotChangeRangeAll(const QCPRange &range);
-private:
-    QDateTime   m_dateTimeStart;
-
-    QElapsedTimer m_timerNs;
 };

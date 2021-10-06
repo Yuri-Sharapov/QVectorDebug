@@ -34,16 +34,16 @@ MainWindow::MainWindow(QWidget *parent)
     m_pUi->cbEnabled_4->setChecked(true);
 
     m_pPort = new Port;
-
+    // create tight thread
     QThread *threadNew = new QThread;
-    m_pPort->moveToThread(threadNew);//помешаем класс  в поток
-    m_pPort->m_port.moveToThread(threadNew);//Помещаем сам порт в поток
-
-    connect(threadNew, SIGNAL(started()), m_pPort, SLOT(process()));//Переназначения метода run
-    connect(m_pPort, SIGNAL(finished()), threadNew, SLOT(quit()));//Переназначение метода выход
-
+    // move class to new thread
+    m_pPort->moveToThread(threadNew);
+    // move port to thread
+    m_pPort->m_port.moveToThread(threadNew);
+    connect(threadNew, SIGNAL(started()), m_pPort, SLOT(process()));
+    connect(m_pPort, SIGNAL(finished()), threadNew, SLOT(quit()));
     connect(m_pPort, &Port::updatePlot, this, &MainWindow::on_PortUpdatePlot);
-
+    // run new thread
     threadNew->start();
 
     serialSetup();
@@ -165,7 +165,8 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_actionOpen_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open Vector file"), "./",tr("Vector Files (*.vct)"));
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open Vector file"), "./",
+                                                        tr("Vector Files (*.vct)"));
 
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly))
@@ -192,7 +193,7 @@ void MainWindow::serialSetup(void)
     m_pUi->cbBaudrate->addItem(QStringLiteral("38400"), QSerialPort::Baud38400);
     m_pUi->cbBaudrate->addItem(QStringLiteral("57600"), QSerialPort::Baud57600);
     m_pUi->cbBaudrate->addItem(QStringLiteral("115200"), QSerialPort::Baud115200);
-    //m_pUi->cbBaudrate->addItem(tr("Custom"));
+    m_pUi->cbBaudrate->addItem(tr("Custom"));
     m_pUi->cbBaudrate->setCurrentIndex(0);
 
     m_pUi->cbBaudrate->setInsertPolicy(QComboBox::NoInsert);
@@ -255,7 +256,9 @@ void MainWindow::openChart(QVector<Port::ChartVar> *pVars)
         else
         {
             if (timePrevNs/1000000U != var.timeNs/1000000U)
+            {
                 m_pChart->appendData(var.timeNs, var.data[0], var.data[1], var.data[2], var.data[3]);
+            }
 
             timePrevNs = var.timeNs;
         }
@@ -269,7 +272,7 @@ void MainWindow::showStatusMessage(const QString &message)
     m_pStatus->setText(message);
 }
 
-void Port::PortReadyRead()
+void Port::portReadyRead()
 {
     QByteArray array = m_port.readAll();
     protocolParseData(array);
@@ -296,7 +299,7 @@ bool Port::openPort(long _baudrate, QString _name)
 
     if (m_port.open(QIODevice::ReadWrite))
     {
-        connect(&m_port, &QSerialPort::readyRead, this, &Port::PortReadyRead);
+        connect(&m_port, &QSerialPort::readyRead, this, &Port::portReadyRead);
 
         m_timerNs.start();
         m_timerNs_1 = 0;
@@ -378,10 +381,9 @@ void Port::protocolParseData(const QByteArray &data)
                     _chartVar.timeNs = m_timerNs.nsecsElapsed();
 
                     m_rxRawData.push_back(_chartVar);
-
-                    if (_chartVar.timeNs - m_timerNs_1 > 1000000 * 100)
+                    // update gui if it need
+                    if (_chartVar.timeNs - m_timerNs_1 > 1000000 * GUI_UPDATE_PERIOD_MS)
                     {
-
                         m_timerNs_1 = _chartVar.timeNs;
                         emit updatePlot(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
                     }

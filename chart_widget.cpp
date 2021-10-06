@@ -23,12 +23,6 @@ ChartWidget::ChartWidget(QCustomPlot *parent) :
 {
     setupChart(this);
 
-    /*for (int i = 0; i < 100; i++)
-    {
-        this->graph(0)->addData(i, sin(M_PI * i/10));
-        this->graph(1)->addData(i, sin(M_PI * i/10 + M_PI/3));
-        this->graph(2)->addData(i, sin(M_PI * i/10 + M_PI*2/3));
-    }*/
     this->rescaleAxes();
     this->replot();
 }

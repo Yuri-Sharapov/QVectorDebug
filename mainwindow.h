@@ -26,6 +26,7 @@
 #include "chart_widget.h"
 
 #define PROTOCOL_START_BYTE     0x55
+#define GUI_UPDATE_PERIOD_MS    100
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -37,17 +38,17 @@ class Port : public QObject
 
     typedef struct __attribute__ ((packed)) ProtocolData_struct
     {
-        int16_t    data[4];
+        int16_t     data[4];
         uint8_t     checkSum;
     }ProtocolData_t;
 
 private slots:
-    void PortReadyRead();
+    void portReadyRead();
 public:
     struct ChartVar
     {
         qint64  timeNs;
-        short data[4];
+        short   data[4];
     };
 
     explicit Port(QObject *parent = 0);
@@ -80,9 +81,6 @@ signals:
     void updatePlot(qint64 timeNs, short var1, short var2, short var3, short var4);
 private:
     void protocolParseData(const QByteArray &data);
-
-    long        m_baudrate;
-    QString     m_name;
 
     QByteArray      m_rxData;
     QVector<ChartVar> m_rxRawData;
