@@ -28,6 +28,10 @@
 #define PROTOCOL_START_BYTE     0x55
 #define GUI_UPDATE_PERIOD_MS    100
 
+#define TLP_BYTE_START  0xFF
+#define TLP_BYTE_STOP   0xFE
+#define TLP_BYTE_ESC    0xFD
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -38,7 +42,7 @@ class Port : public QObject
 
     typedef struct __attribute__ ((packed)) ProtocolData_struct
     {
-        int16_t     data[4];
+        int16_t    data[4];
         uint8_t     checkSum;
     }ProtocolData_t;
 
@@ -48,7 +52,13 @@ public:
     struct ChartVar
     {
         qint64  timeNs;
-        short   data[4];
+        short data[4];
+    };
+
+    enum ProcotolType_e
+    {
+        TYPE_CLASSIC,
+        TYPE_TDFP
     };
 
     explicit Port(QObject *parent = 0);
@@ -72,6 +82,11 @@ public:
         return m_errorsCnt;
     }
 
+    void setProtocolType(ProcotolType_e type)
+    {
+        m_currentProtocolType = type;
+    }
+
     QSerialPort m_port;
 public slots:
     void process();
@@ -81,6 +96,16 @@ signals:
     void updatePlot(qint64 timeNs, short var1, short var2, short var3, short var4);
 private:
     void protocolParseData(const QByteArray &data);
+    void protocolParseTdfp(const QByteArray &data);
+
+
+    bool tlpParseByte(uint8_t byte);
+    void tlpPutData(uint8_t *pData, uint32_t size);
+
+    long        m_baudrate;
+    QString     m_name;
+
+    QVector<uint8_t> m_tlpBuf;
 
     QByteArray      m_rxData;
     QVector<ChartVar> m_rxRawData;
@@ -88,6 +113,7 @@ private:
     qint64          m_timerNs_1;
 
     int             m_errorsCnt = 0;
+    ProcotolType_e  m_currentProtocolType;
 };
 
 class MainWindow : public QMainWindow
@@ -113,6 +139,10 @@ private slots:
     void on_actionOpen_triggered();
 
     void on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4);
+    void on_actionTdfp_toggled(bool arg1);
+
+    void on_actionClassic_toggled(bool arg1);
+
 private:
     void showStatusMessage(const QString &message);
 

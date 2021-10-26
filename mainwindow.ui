@@ -99,7 +99,7 @@
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="tabClassic">
+            <widget class="QWidget" name="tab">
              <attribute name="title">
               <string>Classic</string>
              </attribute>
@@ -310,7 +310,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tabExtended">
+            <widget class="QWidget" name="tab_2">
              <attribute name="title">
               <string>Extended</string>
              </attribute>
@@ -378,7 +378,24 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <widget class="QMenu" name="menuProtocol">
+     <property name="tearOffEnabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Protocol</string>
+     </property>
+     <addaction name="actionClassic"/>
+     <addaction name="actionTdfp"/>
+    </widget>
+    <addaction name="menuProtocol"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuOptions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
@@ -394,6 +411,28 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionClassic">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Classic</string>
+   </property>
+  </action>
+  <action name="actionTdfp">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Tdfp</string>
    </property>
   </action>
  </widget>

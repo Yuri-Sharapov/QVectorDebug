@@ -165,8 +165,7 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_actionOpen_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open Vector file"), "./",
-                                                        tr("Vector Files (*.vct)"));
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open Vector file"), "./",tr("Vector Files (*.vct)"));
 
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly))
@@ -256,9 +255,7 @@ void MainWindow::openChart(QVector<Port::ChartVar> *pVars)
         else
         {
             if (timePrevNs/1000000U != var.timeNs/1000000U)
-            {
                 m_pChart->appendData(var.timeNs, var.data[0], var.data[1], var.data[2], var.data[3]);
-            }
 
             timePrevNs = var.timeNs;
         }
@@ -275,7 +272,10 @@ void MainWindow::showStatusMessage(const QString &message)
 void Port::portReadyRead()
 {
     QByteArray array = m_port.readAll();
-    protocolParseData(array);
+    if (m_currentProtocolType == TYPE_CLASSIC)
+        protocolParseData(array);
+    else
+        protocolParseTdfp(array);
 }
 
 Port::Port(QObject *parent) :
@@ -384,6 +384,7 @@ void Port::protocolParseData(const QByteArray &data)
                     // update gui if it need
                     if (_chartVar.timeNs - m_timerNs_1 > 1000000 * GUI_UPDATE_PERIOD_MS)
                     {
+
                         m_timerNs_1 = _chartVar.timeNs;
                         emit updatePlot(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
                     }
@@ -400,4 +401,120 @@ void Port::protocolParseData(const QByteArray &data)
             break;
         }
     }
+}
+
+void Port::protocolParseTdfp(const QByteArray &data)
+{
+    for (int i = 0; i < data.size(); i++)
+    {
+        if (tlpParseByte(data.data()[i]))
+        {
+            const ProtocolData_t* _pData = reinterpret_cast<ProtocolData_t*>(m_tlpBuf.data());
+
+            uint8_t _crc = 10;
+            for (int k = 0; k < m_tlpBuf.count() - 1; k++)
+            {
+                _crc += static_cast<uint8_t>(m_tlpBuf.constData()[k]);
+            }
+            if (_crc == _pData->checkSum)
+            {
+                ChartVar _chartVar;
+                _chartVar.data[0] = _pData->data[0];
+                _chartVar.data[1] = _pData->data[1];
+                _chartVar.data[2] = _pData->data[2];
+                _chartVar.data[3] = _pData->data[3];
+
+                _chartVar.timeNs = m_timerNs.nsecsElapsed();
+
+                m_rxRawData.push_back(_chartVar);
+
+                if (_chartVar.timeNs - m_timerNs_1 > 1000000 * 100)
+                {
+
+                    m_timerNs_1 = _chartVar.timeNs;
+                    emit updatePlot(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
+                }
+            }
+            else
+            {
+                m_errorsCnt++;
+            }
+        }
+    }
+}
+
+bool Port::tlpParseByte(uint8_t byte)
+{
+    static bool rxIsData = false;
+
+    if (byte == TLP_BYTE_START)
+    {
+        m_tlpBuf.clear();
+        rxIsData = true;
+        return false;
+    }
+    if (byte == TLP_BYTE_STOP)
+    {
+        rxIsData = true;
+        return true;
+    }
+    if (rxIsData)
+    {
+        if (byte == TLP_BYTE_ESC)
+        {
+            rxIsData = false;
+            return false;
+        }
+        m_tlpBuf.push_back(byte);
+        return false;
+    }
+    else
+    {
+        m_tlpBuf.push_back(byte + TLP_BYTE_ESC);
+        rxIsData = true;
+        return false;
+    }
+    // Oops how we get here?
+    return false;
+}
+
+void Port::tlpPutData(uint8_t *pData, uint32_t size)
+{
+    if (!m_port.isOpen())
+    {
+        qDebug() << "FspLink: error, tlpPutData not connected";
+        return;
+    }
+
+    QByteArray data;
+    data.push_back(TLP_BYTE_START);
+    while (size--)
+    {
+        if (*pData == TLP_BYTE_START || *pData == TLP_BYTE_STOP || *pData == TLP_BYTE_ESC)
+        {
+            data.push_back(TLP_BYTE_ESC);
+            data.push_back(*pData - TLP_BYTE_ESC);
+            pData++;
+        }
+        else
+        {
+            data.push_back(*pData++);
+        }
+    }
+    data.push_back(TLP_BYTE_STOP);
+
+    m_port.write(data);
+    m_port.waitForBytesWritten(3000);
+}
+
+void MainWindow::on_actionTdfp_toggled(bool arg1)
+{
+    m_pUi->actionClassic->setChecked(!arg1);
+    m_pPort->setProtocolType(Port::ProcotolType_e::TYPE_TDFP);
+}
+
+void MainWindow::on_actionClassic_toggled(bool arg1)
+{
+    m_pUi->actionTdfp->setChecked(!arg1);
+    m_pPort->setProtocolType(Port::ProcotolType_e::TYPE_CLASSIC);
 }

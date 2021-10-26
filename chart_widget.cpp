@@ -1,6 +1,6 @@
 /*
  * This file is part of the QVectorDebug (https://github.com/Yuri-Sharapov/QVectorDebug).
- * Copyright (c) 2021 Yuris Sharapov.
+ * Copyright (c) 2021 Yuri Sharapov.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,7 +71,8 @@ void ChartWidget::changeVisablilty(int graph, bool state)
 
 void ChartWidget::setupChart(QCustomPlot *pChart)
 {
-    pChart->setBackground(QBrush(QColor(254,254,254)));
+    pChart->setBackground(QBrush(QColor(42,42,42)));
+
 
     pChart->clearItems();
     //pcChart->yAxis->setTickStep(100);
@@ -81,6 +82,7 @@ void ChartWidget::setupChart(QCustomPlot *pChart)
     //pChart->legend->setVisible(true);
     QFont legendFont = font();
     legendFont.setPointSize(10);
+
     pChart->legend->setFont(legendFont);
     pChart->legend->setSelectedFont(legendFont);
     pChart->legend->setSelectableParts(QCPLegend::spItems); // legend box shall not be selectable, only legend items
@@ -89,10 +91,10 @@ void ChartWidget::setupChart(QCustomPlot *pChart)
     pChart->graph(0)->setPen(QPen(Qt::red));
     pChart->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
     pChart->addGraph();                                                             // add Graph 1
-    pChart->graph(1)->setPen(QPen(Qt::green));
+    pChart->graph(1)->setPen(QPen(Qt::blue));
     pChart->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
     pChart->addGraph();                                                             // add Graph 1
-    pChart->graph(2)->setPen(QPen(Qt::blue));
+    pChart->graph(2)->setPen(QPen(Qt::green));
     pChart->graph(2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
     pChart->addGraph();                                                             // add Graph 1
     pChart->graph(3)->setPen(QPen(Qt::yellow));
