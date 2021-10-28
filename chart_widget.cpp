@@ -63,6 +63,45 @@ void ChartWidget::updateChart()
     this->replot();
 }
 
+void ChartWidget::setThemeBackground(const QColor &brush)
+{
+    if (brush == Qt::white)
+    {
+        this->setBackground(QBrush(QColor(242,242,242)));
+
+        this->xAxis->setTickLabelColor(Qt::black);
+        this->xAxis->setBasePen(QPen(Qt::black));
+        this->xAxis->setLabelColor(Qt::black);
+        this->xAxis->setTickPen(QPen(Qt::black));
+        this->xAxis->setSubTickPen(QPen(Qt::black));
+
+        this->yAxis->setTickLabelColor(Qt::black);
+        this->yAxis->setBasePen(QPen(Qt::black));
+        this->yAxis->setLabelColor(Qt::black);
+        this->yAxis->setTickPen(QPen(Qt::black));
+        this->yAxis->setSubTickPen(QPen(Qt::black));
+    }
+    else
+    {
+        this->setBackground(QBrush(QColor(42,42,42)));
+
+        this->xAxis->setTickLabelColor(Qt::white);
+        this->xAxis->setBasePen(QPen(Qt::white));
+        this->xAxis->setLabelColor(Qt::white);
+        this->xAxis->setTickPen(QPen(Qt::white));
+        this->xAxis->setSubTickPen(QPen(Qt::white));
+
+        this->yAxis->setTickLabelColor(Qt::white);
+        this->yAxis->setBasePen(QPen(Qt::white));
+        this->yAxis->setLabelColor(Qt::white);
+        this->yAxis->setTickPen(QPen(Qt::white));
+        this->yAxis->setSubTickPen(QPen(Qt::white));
+    }
+
+
+    this->replot();
+}
+
 void ChartWidget::changeVisablilty(int graph, bool state)
 {
     this->graph(graph)->setVisible(state);
@@ -72,7 +111,6 @@ void ChartWidget::changeVisablilty(int graph, bool state)
 void ChartWidget::setupChart(QCustomPlot *pChart)
 {
     pChart->setBackground(QBrush(QColor(42,42,42)));
-
 
     pChart->clearItems();
     //pcChart->yAxis->setTickStep(100);

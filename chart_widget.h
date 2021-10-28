@@ -32,6 +32,8 @@ public:
 
     void startChart(void);
     void updateChart(void);
+
+    void setThemeBackground(const QColor &brush);
 public slots:
     void changeVisablilty(int graph, bool state);
 private:

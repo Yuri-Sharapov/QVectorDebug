@@ -12,12 +12,14 @@ SOURCES += \
     chart_widget.cpp \
     libs/qcustomplot/qcustomplot.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    port.cpp
 
 HEADERS += \
     chart_widget.h \
     libs/qcustomplot/qcustomplot.h \
-    mainwindow.h
+    mainwindow.h \
+    port.h
 
 FORMS += \
     mainwindow.ui

@@ -392,7 +392,15 @@
      <addaction name="actionClassic"/>
      <addaction name="actionTdfp"/>
     </widget>
+    <widget class="QMenu" name="menuTheme">
+     <property name="title">
+      <string>Theme</string>
+     </property>
+     <addaction name="actionWhite"/>
+     <addaction name="actionBlack"/>
+    </widget>
     <addaction name="menuProtocol"/>
+    <addaction name="menuTheme"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOptions"/>
@@ -433,6 +441,22 @@
    </property>
    <property name="text">
     <string>Tdfp</string>
+   </property>
+  </action>
+  <action name="actionWhite">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>White</string>
+   </property>
+  </action>
+  <action name="actionBlack">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Black</string>
    </property>
   </action>
  </widget>

@@ -21,10 +21,12 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_pUi(new Ui::MainWindow)
+    , m_pPort(new Port)
+    , m_pChart(new ChartWidget)
+    , m_pSettings(new QSettings("settings.ini",QSettings::IniFormat))
 {
     m_pUi->setupUi(this);
 
-    m_pChart = new ChartWidget();
     m_pChart->setObjectName(QString::fromUtf8("wgtChart"));
     m_pUi->horizontalLayout->addWidget(m_pChart);
 
@@ -33,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_pUi->cbEnabled_3->setChecked(true);
     m_pUi->cbEnabled_4->setChecked(true);
 
-    m_pPort = new Port;
     // create tight thread
     QThread *threadNew = new QThread;
     // move class to new thread
@@ -46,8 +47,6 @@ MainWindow::MainWindow(QWidget *parent)
     // run new thread
     threadNew->start();
 
-    serialSetup();
-
     m_pStatus = new QLabel(this);
     m_pUi->statusbar->addWidget(m_pStatus);
 
@@ -59,14 +58,44 @@ MainWindow::MainWindow(QWidget *parent)
     m_pUi->cbSign_4->setEnabled(false);
     m_pUi->leSendVar_1->setEnabled(false);
     m_pUi->leSendVar_2->setEnabled(false);
+
+
+    m_paletteWhite = qApp->palette();
+
+    m_paletteBlack.setColor(QPalette::Window,QColor(53,53,53));
+    m_paletteBlack.setColor(QPalette::WindowText,Qt::white);
+    m_paletteBlack.setColor(QPalette::Disabled,QPalette::WindowText,QColor(127,127,127));
+    m_paletteBlack.setColor(QPalette::Base,QColor(42,42,42));
+    m_paletteBlack.setColor(QPalette::AlternateBase,QColor(66,66,66));
+    m_paletteBlack.setColor(QPalette::ToolTipBase,Qt::white);
+    m_paletteBlack.setColor(QPalette::ToolTipText,Qt::white);
+    m_paletteBlack.setColor(QPalette::Text,Qt::white);
+    m_paletteBlack.setColor(QPalette::Disabled,QPalette::Text,QColor(127,127,127));
+    m_paletteBlack.setColor(QPalette::Dark,QColor(35,35,35));
+    m_paletteBlack.setColor(QPalette::Shadow,QColor(20,20,20));
+    m_paletteBlack.setColor(QPalette::Button,QColor(53,53,53));
+    m_paletteBlack.setColor(QPalette::ButtonText,Qt::white);
+    m_paletteBlack.setColor(QPalette::Disabled,QPalette::ButtonText,QColor(127,127,127));
+    m_paletteBlack.setColor(QPalette::BrightText,Qt::red);
+    m_paletteBlack.setColor(QPalette::Link,QColor(42,130,218));
+    m_paletteBlack.setColor(QPalette::Highlight,QColor(42,130,218));
+    m_paletteBlack.setColor(QPalette::Disabled,QPalette::Highlight,QColor(80,80,80));
+    m_paletteBlack.setColor(QPalette::HighlightedText,Qt::white);
+    m_paletteBlack.setColor(QPalette::Disabled,QPalette::HighlightedText,QColor(127,127,127));
+
+    serialSetup();
+    updateSettings();
 }
 
 MainWindow::~MainWindow()
 {
+    saveSettings();
+
     delete m_pUi;
-    delete m_pChart;
-    delete m_pStatus;
     delete m_pPort;
+    delete m_pChart;
+    delete m_pSettings;
+    delete m_pStatus;
 }
 
 void MainWindow::on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4)
@@ -269,252 +298,129 @@ void MainWindow::showStatusMessage(const QString &message)
     m_pStatus->setText(message);
 }
 
-void Port::portReadyRead()
+void MainWindow::updateSettings()
 {
-    QByteArray array = m_port.readAll();
-    if (m_currentProtocolType == TYPE_CLASSIC)
-        protocolParseData(array);
-    else
-        protocolParseTdfp(array);
-}
+    if (!m_pSettings->contains("wnd/height"))
+        m_pSettings->setValue("wnd/high", this->height());
+    if (!m_pSettings->contains("wnd/width"))
+        m_pSettings->setValue("wnd/width", this->width());
+    if (!m_pSettings->contains("wnd/maximized"))
+        m_pSettings->setValue("wnd/maximized", 0);
 
-Port::Port(QObject *parent) :
-    QObject(parent)
-{
-    m_rxData.clear();
-    m_rxRawData.clear();
-    m_rxRawData.reserve(1024 * 10);
-}
+    if (!m_pSettings->contains("wnd/theme"))
+        m_pSettings->setValue("wnd/theme", static_cast<int>(m_uiTheme));
 
-Port::~Port()
-{
-    emit finished();
-}
+    if (!m_pSettings->contains("port/protocol"))
+        m_pSettings->setValue("port/protocol", static_cast<int>(m_pPort->getProtocolType()));
+    if (!m_pSettings->contains("port/name"))
+        m_pSettings->setValue("port/name", m_pUi->cbPort->currentIndex());
+    if (!m_pSettings->contains("port/baudrate"))
+        m_pSettings->setValue("port/baudrate", m_pUi->cbBaudrate->currentIndex());
 
-bool Port::openPort(long _baudrate, QString _name)
-{
-    m_port.setPortName(_name);
-    m_port.setBaudRate(_baudrate);
-    m_port.setStopBits(QSerialPort::StopBits::TwoStop);
-
-    if (m_port.open(QIODevice::ReadWrite))
+    m_pSettings->sync();
+    // window
+    this->resize(m_pSettings->value("wnd/width").toInt(), m_pSettings->value("wnd/high").toInt());
+    if (m_pSettings->value("wnd/maximized").toInt() == 1)
     {
-        connect(&m_port, &QSerialPort::readyRead, this, &Port::portReadyRead);
-
-        m_timerNs.start();
-        m_timerNs_1 = 0;
-        m_rxRawData.clear();
-        m_port.clear();
-        m_errorsCnt = 0;
-
-        return true;
+        showMaximized();
+    }
+    // theme
+    m_uiTheme = static_cast<ThemeSelector>(m_pSettings->value("wnd/theme").toInt());
+    updateTheme();
+    // port type
+    m_pPort->setProtocolType(static_cast<Port::ProcotolType_e>(m_pSettings->value("port/protocol").toInt()));
+    if (m_pPort->getProtocolType() == Port::ProcotolType_e::TYPE_CLASSIC)
+    {
+        m_pUi->actionClassic->setChecked(true);
+        m_pUi->actionTdfp->setChecked(false);
     }
     else
     {
-        return false;
+        m_pUi->actionClassic->setChecked(false);
+        m_pUi->actionTdfp->setChecked(true);
     }
+    // port name and baudrate
+    m_pUi->cbBaudrate->setCurrentIndex(m_pSettings->value("port/baudrate").toInt());
+    m_pUi->cbPort->setCurrentIndex(m_pSettings->value("port/name").toInt());
 }
 
-void Port::closePort(void)
+void MainWindow::saveSettings()
 {
-    m_port.close();
-}
-
-void Port::process()
-{
-
-}
-
-void Port::write(const QByteArray &data)
-{
-    if (m_port.isOpen())
+    if (!isMaximized())
     {
-        m_port.write(data);
-    }
-}
-
-void Port::protocolParseData(const QByteArray &data)
-{
-    enum protocolState_e
-    {
-        PROTOCOL_START,
-        PROTOCOL_DATA
-    };
-
-    static protocolState_e _state = PROTOCOL_START;
-
-    for (int i = 0; i < data.count(); i++)
-    {
-        uint8_t _c = static_cast<uint8_t>(data.constData()[i]);
-        switch(_state)
-        {
-        case PROTOCOL_START:
-            if (_c == PROTOCOL_START_BYTE)
-            {
-                _state = PROTOCOL_DATA;
-                m_rxData.clear();
-            }
-            break;
-        case PROTOCOL_DATA:
-            if (static_cast<size_t>(m_rxData.count()) < sizeof(ProtocolData_t) - 1)
-            {
-                m_rxData.push_back(_c);
-            }
-            else
-            {
-                uint8_t _crc = 10;
-                for (int k = 0; k < m_rxData.count(); k++)
-                {
-                    _crc += static_cast<uint8_t>(m_rxData.constData()[k]);
-                }
-                if (_crc == _c)
-                {
-                    m_rxData.push_back(_c);
-                    const ProtocolData_t* _pData = reinterpret_cast<ProtocolData_t*>(m_rxData.data());
-
-                    ChartVar _chartVar;
-                    _chartVar.data[0] = _pData->data[0];
-                    _chartVar.data[1] = _pData->data[1];
-                    _chartVar.data[2] = _pData->data[2];
-                    _chartVar.data[3] = _pData->data[3];
-
-                    _chartVar.timeNs = m_timerNs.nsecsElapsed();
-
-                    m_rxRawData.push_back(_chartVar);
-                    // update gui if it need
-                    if (_chartVar.timeNs - m_timerNs_1 > 1000000 * GUI_UPDATE_PERIOD_MS)
-                    {
-
-                        m_timerNs_1 = _chartVar.timeNs;
-                        emit updatePlot(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
-                    }
-                }
-                else
-                {
-                    m_errorsCnt++;
-                }
-                _state = PROTOCOL_START;
-            }
-            break;
-        default:
-            _state = PROTOCOL_START;
-            break;
-        }
-    }
-}
-
-void Port::protocolParseTdfp(const QByteArray &data)
-{
-    for (int i = 0; i < data.size(); i++)
-    {
-        if (tlpParseByte(data.data()[i]))
-        {
-            const ProtocolData_t* _pData = reinterpret_cast<ProtocolData_t*>(m_tlpBuf.data());
-
-            uint8_t _crc = 10;
-            for (int k = 0; k < m_tlpBuf.count() - 1; k++)
-            {
-                _crc += static_cast<uint8_t>(m_tlpBuf.constData()[k]);
-            }
-            if (_crc == _pData->checkSum)
-            {
-                ChartVar _chartVar;
-                _chartVar.data[0] = _pData->data[0];
-                _chartVar.data[1] = _pData->data[1];
-                _chartVar.data[2] = _pData->data[2];
-                _chartVar.data[3] = _pData->data[3];
-
-                _chartVar.timeNs = m_timerNs.nsecsElapsed();
-
-                m_rxRawData.push_back(_chartVar);
-
-                if (_chartVar.timeNs - m_timerNs_1 > 1000000 * 100)
-                {
-
-                    m_timerNs_1 = _chartVar.timeNs;
-                    emit updatePlot(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
-                }
-            }
-            else
-            {
-                m_errorsCnt++;
-            }
-        }
-    }
-}
-
-bool Port::tlpParseByte(uint8_t byte)
-{
-    static bool rxIsData = false;
-
-    if (byte == TLP_BYTE_START)
-    {
-        m_tlpBuf.clear();
-        rxIsData = true;
-        return false;
-    }
-    if (byte == TLP_BYTE_STOP)
-    {
-        rxIsData = true;
-        return true;
-    }
-    if (rxIsData)
-    {
-        if (byte == TLP_BYTE_ESC)
-        {
-            rxIsData = false;
-            return false;
-        }
-        m_tlpBuf.push_back(byte);
-        return false;
+        m_pSettings->setValue("wnd/high", this->height());
+        m_pSettings->setValue("wnd/width", this->width());
+        m_pSettings->setValue("wnd/maximized", 0);
     }
     else
     {
-        m_tlpBuf.push_back(byte + TLP_BYTE_ESC);
-        rxIsData = true;
-        return false;
+        m_pSettings->setValue("wnd/maximized", 1);
     }
-    // Oops how we get here?
-    return false;
+
+
+    m_pSettings->setValue("wnd/theme", static_cast<int>(m_uiTheme));
+    m_pSettings->setValue("port/protocol", static_cast<int>(m_pPort->getProtocolType()));
+    m_pSettings->setValue("port/name", m_pUi->cbPort->currentIndex());
+    m_pSettings->setValue("port/baudrate", m_pUi->cbBaudrate->currentIndex());
+    m_pSettings->sync();
 }
 
-void Port::tlpPutData(uint8_t *pData, uint32_t size)
+void MainWindow::updateTheme()
 {
-    if (!m_port.isOpen())
+    if (m_uiTheme == THEME_WHITE)
     {
-        qDebug() << "FspLink: error, tlpPutData not connected";
-        return;
-    }
+        on_actionWhite_toggled(true);
 
-    QByteArray data;
-    data.push_back(TLP_BYTE_START);
-    while (size--)
+        qApp->setStyle(QStyleFactory::create("Fusion"));
+        qApp->setPalette(m_paletteWhite);
+
+        m_pChart->setThemeBackground(Qt::white);
+    }
+    else
     {
-        if (*pData == TLP_BYTE_START || *pData == TLP_BYTE_STOP || *pData == TLP_BYTE_ESC)
-        {
-            data.push_back(TLP_BYTE_ESC);
-            data.push_back(*pData - TLP_BYTE_ESC);
-            pData++;
-        }
-        else
-        {
-            data.push_back(*pData++);
-        }
-    }
-    data.push_back(TLP_BYTE_STOP);
+        on_actionBlack_toggled(true);
 
-    m_port.write(data);
-    m_port.waitForBytesWritten(3000);
+        qApp->setStyle(QStyleFactory::create("Fusion"));
+        qApp->setPalette(m_paletteBlack);
+
+        m_pChart->setThemeBackground(Qt::black);
+    }
 }
 
 void MainWindow::on_actionTdfp_toggled(bool arg1)
 {
-    m_pUi->actionClassic->setChecked(!arg1);
-    m_pPort->setProtocolType(Port::ProcotolType_e::TYPE_TDFP);
+    if (arg1)
+    {
+        m_pUi->actionClassic->setChecked(!arg1);
+        m_pPort->setProtocolType(Port::ProcotolType_e::TYPE_TDFP);
+    }
 }
 
 void MainWindow::on_actionClassic_toggled(bool arg1)
 {
-    m_pUi->actionTdfp->setChecked(!arg1);
-    m_pPort->setProtocolType(Port::ProcotolType_e::TYPE_CLASSIC);
+    if (arg1)
+    {
+        m_pUi->actionTdfp->setChecked(!arg1);
+        m_pPort->setProtocolType(Port::ProcotolType_e::TYPE_CLASSIC);
+    }
+}
+
+void MainWindow::on_actionBlack_toggled(bool arg1)
+{
+    if (arg1)
+    {
+        m_uiTheme = THEME_BLACK;
+        m_pUi->actionWhite->setChecked(!arg1);
+        m_pUi->actionBlack->setChecked(arg1);
+    }
+}
+
+void MainWindow::on_actionWhite_toggled(bool arg1)
+{
+    if (arg1)
+    {
+        m_uiTheme = THEME_WHITE;
+        m_pUi->actionBlack->setChecked(!arg1);
+        m_pUi->actionWhite->setChecked(arg1);
+    }
 }
