@@ -51,13 +51,13 @@ MainWindow::MainWindow(QWidget *parent)
     m_pUi->statusbar->addWidget(m_pStatus);
 
     // disable unused
-    m_pUi->btnSend->setEnabled(false);
+    m_pUi->btnSend->setEnabled(true);
     m_pUi->cbSign_1->setEnabled(false);
     m_pUi->cbSign_2->setEnabled(false);
     m_pUi->cbSign_3->setEnabled(false);
     m_pUi->cbSign_4->setEnabled(false);
-    m_pUi->leSendVar_1->setEnabled(false);
-    m_pUi->leSendVar_2->setEnabled(false);
+    m_pUi->leSendVar_1->setEnabled(true);
+    m_pUi->leSendVar_2->setEnabled(true);
 
 
     m_paletteWhite = qApp->palette();
@@ -152,7 +152,32 @@ void MainWindow::on_cbEnabled_4_stateChanged(int arg1)
 
 void MainWindow::on_btnSend_clicked()
 {
+    QByteArray dataToSend;
+    // start byte
+    dataToSend.append(0x55);
+    // data bytes
+    int16_t data1 = static_cast<int16_t>(m_pUi->leSendVar_1->text().toInt());
+    int16_t data2 = static_cast<int16_t>(m_pUi->leSendVar_2->text().toInt());
+    // place new text into line edits to avoid empty lines
+    m_pUi->leSendVar_1->setText(QString::number(data1));
+    m_pUi->leSendVar_2->setText(QString::number(data2));
 
+    dataToSend.append(data1 & 0xFF);
+    dataToSend.append(data1 >> 8);
+
+    dataToSend.append(data2 & 0xFF);
+    dataToSend.append(data2 >> 8);
+
+    // check sum
+    uint8_t chkSum = 10;
+
+    for (int i = 1; i < dataToSend.count() - 1; i++) {
+        chkSum += dataToSend.at(i);
+    }
+
+    dataToSend.append(chkSum);
+
+    m_pPort->write(dataToSend);
 }
 
 void MainWindow::on_actionExit_triggered()
