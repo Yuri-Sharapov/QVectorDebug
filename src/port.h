@@ -33,22 +33,22 @@ class Port : public QObject
 {
     Q_OBJECT
 
-    typedef struct __attribute__ ((packed)) ProtocolData_struct
+#pragma pack(push, 1)
+    struct ProtocolData
     {
         int16_t    data[4];
-        uint8_t     checkSum;
-    }ProtocolData_t;
+        uint8_t    checkSum;
+    };
+#pragma pack( pop )
 
-private slots:
-    void portReadyRead();
 public:
     struct ChartVar
     {
-        qint64  timeNs;
-        short data[4];
+        uint64_t    timeNs;
+        int16_t     data[4];
     };
 
-    enum ProcotolType_e
+    enum ProcotolType
     {
         TYPE_CLASSIC = 0,
         TYPE_TDFP = 1
@@ -75,42 +75,48 @@ public:
         return m_errorsCnt;
     }
 
-    void setProtocolType(ProcotolType_e type)
+    void setProtocolType(ProcotolType type)
     {
         m_currentProtocolType = type;
     }
 
-    ProcotolType_e getProtocolType(void)
+    ProcotolType getProtocolType(void)
     {
         return m_currentProtocolType;
     }
 
-    QSerialPort m_port;
 public slots:
     void process();
     void write(const QByteArray &data);
+
+private slots:
+    void portReadyRead();
+
 signals:
     void finished();
     void updatePlot(qint64 timeNs, short var1, short var2, short var3, short var4);
+
 private:
     void protocolParseData(const QByteArray &data);
     void protocolParseTdfp(const QByteArray &data);
 
-
     bool tlpParseByte(uint8_t byte);
     void tlpPutData(uint8_t *pData, uint32_t size);
 
-    long        m_baudrate;
-    QString     m_name;
+public:
+    QSerialPort         m_port;
 
-    QVector<uint8_t> m_tlpBuf;
+private:
+    uint32_t            m_baudrate;
+    QString             m_name;
 
-    QByteArray      m_rxData;
-    QVector<ChartVar> m_rxRawData;
-    QElapsedTimer   m_timerNs;
-    qint64          m_timerNs_1;
+    QVector<uint8_t>    m_tlpBuf;
 
-    int             m_errorsCnt = 0;
-    ProcotolType_e  m_currentProtocolType;
+    QByteArray          m_rxData;
+    QVector<ChartVar>   m_rxRawData;
+    QElapsedTimer       m_timerNs;
+    uint64_t            m_timerNs_1;
+
+    uint32_t            m_errorsCnt = 0;
+    ProcotolType        m_currentProtocolType;
 };
-

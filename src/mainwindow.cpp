@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_pUi->setupUi(this);
 
     m_pChart->setObjectName(QString::fromUtf8("wgtChart"));
-    m_pUi->horizontalLayout->addWidget(m_pChart);
+    m_pUi->layChart->addWidget(m_pChart);
 
     m_pUi->cbEnabled_1->setChecked(true);
     m_pUi->cbEnabled_2->setChecked(true);
@@ -84,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_paletteBlack.setColor(QPalette::Disabled,QPalette::HighlightedText,QColor(127,127,127));
 
     serialSetup();
-    updateSettings();
+    restoreSettings();
 }
 
 MainWindow::~MainWindow()
@@ -253,7 +253,7 @@ void MainWindow::serialSetup(void)
     connect(m_pUi->cbBaudrate,  QOverload<int>::of(&QComboBox::currentIndexChanged),
     [this](int idx)
     {
-        QIntValidator   *m_intValidator = nullptr;
+        QIntValidator   *m_intValidator =  new QIntValidator(0, 4000000, this);
         const bool isCustomBaudRate = !m_pUi->cbBaudrate->itemData(idx).isValid();
         m_pUi->cbBaudrate->setEditable(isCustomBaudRate);
 
@@ -275,7 +275,17 @@ void MainWindow::serialSetup(void)
 
 void MainWindow::serialConnect()
 {
-    if (m_pPort->openPort(m_pUi->cbBaudrate->itemData(m_pUi->cbBaudrate->currentIndex()).toInt(),
+    unsigned int baudrate;
+    if (m_pUi->cbBaudrate->currentIndex() == m_pUi->cbBaudrate->count() - 1)
+    {
+        baudrate = m_pUi->cbBaudrate->currentText().toInt();
+    }
+    else
+    {
+        baudrate = m_pUi->cbBaudrate->itemData(m_pUi->cbBaudrate->currentIndex()).toInt();
+    }
+
+    if (m_pPort->openPort(baudrate,
                         m_pUi->cbPort->currentText()))
     {
         showStatusMessage(tr("Connected to %1: %2").arg(m_pUi->cbPort->currentText())
@@ -323,7 +333,7 @@ void MainWindow::showStatusMessage(const QString &message)
     m_pStatus->setText(message);
 }
 
-void MainWindow::updateSettings()
+void MainWindow::restoreSettings()
 {
     if (!m_pSettings->contains("wnd/height"))
         m_pSettings->setValue("wnd/high", this->height());
@@ -331,6 +341,10 @@ void MainWindow::updateSettings()
         m_pSettings->setValue("wnd/width", this->width());
     if (!m_pSettings->contains("wnd/maximized"))
         m_pSettings->setValue("wnd/maximized", 0);
+    if (!m_pSettings->contains("wnd/left_panel"))
+        m_pSettings->setValue("wnd/left_panel", m_pUi->splitter->saveState());
+    if (!m_pSettings->contains("wnd/left_panel_tab"))
+        m_pSettings->setValue("wnd/left_panel_tab", m_pUi->tabWidget->currentIndex());
 
     if (!m_pSettings->contains("wnd/theme"))
         m_pSettings->setValue("wnd/theme", static_cast<int>(m_uiTheme));
@@ -349,12 +363,17 @@ void MainWindow::updateSettings()
     {
         showMaximized();
     }
+    // left panel
+    QByteArray splitterState = m_pSettings->value("wnd/left_panel").toByteArray();
+    m_pUi->splitter->restoreState(splitterState);
+    m_pUi->tabWidget->setCurrentIndex(m_pSettings->value("wnd/left_panel_tab").toInt());
+    
     // theme
     m_uiTheme = static_cast<ThemeSelector>(m_pSettings->value("wnd/theme").toInt());
     updateTheme();
     // port type
-    m_pPort->setProtocolType(static_cast<Port::ProcotolType_e>(m_pSettings->value("port/protocol").toInt()));
-    if (m_pPort->getProtocolType() == Port::ProcotolType_e::TYPE_CLASSIC)
+    m_pPort->setProtocolType(static_cast<Port::ProcotolType>(m_pSettings->value("port/protocol").toInt()));
+    if (m_pPort->getProtocolType() == Port::ProcotolType::TYPE_CLASSIC)
     {
         m_pUi->actionClassic->setChecked(true);
         m_pUi->actionTdfp->setChecked(false);
@@ -382,6 +401,9 @@ void MainWindow::saveSettings()
         m_pSettings->setValue("wnd/maximized", 1);
     }
 
+    // left panel
+    m_pSettings->setValue("wnd/left_panel", m_pUi->splitter->saveState());
+    m_pSettings->setValue("wnd/left_panel_tab", m_pUi->tabWidget->currentIndex());
 
     m_pSettings->setValue("wnd/theme", static_cast<int>(m_uiTheme));
     m_pSettings->setValue("port/protocol", static_cast<int>(m_pPort->getProtocolType()));
@@ -417,7 +439,7 @@ void MainWindow::on_actionTdfp_toggled(bool arg1)
     if (arg1)
     {
         m_pUi->actionClassic->setChecked(!arg1);
-        m_pPort->setProtocolType(Port::ProcotolType_e::TYPE_TDFP);
+        m_pPort->setProtocolType(Port::ProcotolType::TYPE_TDFP);
     }
 }
 
@@ -426,7 +448,7 @@ void MainWindow::on_actionClassic_toggled(bool arg1)
     if (arg1)
     {
         m_pUi->actionTdfp->setChecked(!arg1);
-        m_pPort->setProtocolType(Port::ProcotolType_e::TYPE_CLASSIC);
+        m_pPort->setProtocolType(Port::ProcotolType::TYPE_CLASSIC);
     }
 }
 

@@ -41,12 +41,14 @@ Port::~Port()
 
 bool Port::openPort(long _baudrate, QString _name)
 {
-    m_port.setPortName(_name);
-    m_port.setBaudRate(_baudrate);
-    m_port.setStopBits(QSerialPort::StopBits::TwoStop);
 
+    m_port.setPortName(_name);
     if (m_port.open(QIODevice::ReadWrite))
     {
+
+        m_port.setBaudRate(_baudrate);
+        m_port.setStopBits(QSerialPort::StopBits::TwoStop);
+
         connect(&m_port, &QSerialPort::readyRead, this, &Port::portReadyRead);
 
         m_timerNs.start();
@@ -104,7 +106,7 @@ void Port::protocolParseData(const QByteArray &data)
             }
             break;
         case PROTOCOL_DATA:
-            if (static_cast<size_t>(m_rxData.count()) < sizeof(ProtocolData_t) - 1)
+            if (static_cast<size_t>(m_rxData.count()) < sizeof(ProtocolData) - 1)
             {
                 m_rxData.push_back(_c);
             }
@@ -118,7 +120,7 @@ void Port::protocolParseData(const QByteArray &data)
                 if (_crc == _c)
                 {
                     m_rxData.push_back(_c);
-                    const ProtocolData_t* _pData = reinterpret_cast<ProtocolData_t*>(m_rxData.data());
+                    const ProtocolData* _pData = reinterpret_cast<ProtocolData*>(m_rxData.data());
 
                     ChartVar _chartVar;
                     _chartVar.data[0] = _pData->data[0];
@@ -157,36 +159,7 @@ void Port::protocolParseTdfp(const QByteArray &data)
     {
         if (tlpParseByte(data.data()[i]))
         {
-            const ProtocolData_t* _pData = reinterpret_cast<ProtocolData_t*>(m_tlpBuf.data());
-
-            uint8_t _crc = 10;
-            for (int k = 0; k < m_tlpBuf.count() - 1; k++)
-            {
-                _crc += static_cast<uint8_t>(m_tlpBuf.constData()[k]);
-            }
-            if (_crc == _pData->checkSum)
-            {
-                ChartVar _chartVar;
-                _chartVar.data[0] = _pData->data[0];
-                _chartVar.data[1] = _pData->data[1];
-                _chartVar.data[2] = _pData->data[2];
-                _chartVar.data[3] = _pData->data[3];
-
-                _chartVar.timeNs = m_timerNs.nsecsElapsed();
-
-                m_rxRawData.push_back(_chartVar);
-
-                if (_chartVar.timeNs - m_timerNs_1 > 1000000 * 100)
-                {
-
-                    m_timerNs_1 = _chartVar.timeNs;
-                    emit updatePlot(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
-                }
-            }
-            else
-            {
-                m_errorsCnt++;
-            }
+            // TODO: parsing
         }
     }
 }

@@ -72,7 +72,7 @@ private:
 
     void openChart(QVector<Port::ChartVar>* pVars);
 
-    void updateSettings(void);
+    void restoreSettings(void);
     void saveSettings(void);
     void updateTheme(void);
 

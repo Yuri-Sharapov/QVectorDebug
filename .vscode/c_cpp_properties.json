@@ -3,11 +3,12 @@
         {
             "name": "Windows",
             "includePath": [
-                "c:/Qt/5.12.12/mingw73_64/include/",
-                "${workspaceFolder}/**"
+                "C:/Qt/5.12.12/mingw73_64/include/**",
+                "${workspaceFolder}/**",
+                "../build-QVectorDebug-Desktop_Qt_5_12_12_MinGW_64_bit-Release"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/gcc",
+            "compilerPath": "C:/Qt/5.12.12/mingw73_64/bin",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
