@@ -1,4 +1,8 @@
+#include <QDebug>
+
+#include "common/maths.h"
 #include "wave_generator.h"
+
 
 WaveGenerator::WaveGenerator(waveType_e type)
     : m_currentType(type)
@@ -15,8 +19,10 @@ WaveGenerator::~WaveGenerator()
 
 void WaveGenerator::start()
 {
-    m_timeNsPrevious = 0;
     m_timer.start();
+    m_timeNs = m_timer.nsecsElapsed();
+    m_timeNsPrevious = m_timeNs;
+    m_counter = 0;
     m_isOn = true;
 }
 
@@ -31,11 +37,33 @@ void WaveGenerator::update()
     if (!m_isOn)
         return;
 
-    uint64_t timeNs = m_timer.nsecsElapsed();
-    uint64_t timeDelta = m_timer.nsecsElapsed() - m_timeNsPrevious;
-    m_timeNsPrevious = timeNs;
+    m_timeNs = m_timer.nsecsElapsed();
+    qDebug() << "time(wg): " << m_timeNs;
+    uint64_t timeDelta = m_timeNs - m_timeNsPrevious;
 
+    float period = 1.0f / (m_frequency * 10);
 
+    if (timeDelta >= period * 1000000000.f)
+        m_timeNsPrevious = m_timeNs;
+
+    //float part = ((float)timeDelta / 1000000000.f)/period;
+    float part = ((float)m_counter / 1000.0f)/period;
+
+    if (++m_counter > period * 1000)
+        m_counter = 0;
+
+    qDebug() << "period: " << period;
+    qDebug() << "part: " << part;
+
+    m_output = m_amplitude * m_amplitudeRadio * math::sin_approx(2.0f * M_PIf * part);
+
+}
+
+uint64_t WaveGenerator::getTime()
+{
+    uint64_t retTime;
+    retTime = m_timeNs;
+    return retTime;
 }
 
 void WaveGenerator::configCreate(const QString name, float value)

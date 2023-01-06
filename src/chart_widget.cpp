@@ -18,13 +18,15 @@
 #include <math.h>
 #include "chart_widget.h"
 
-ChartWidget::ChartWidget(QCustomPlot *parent) :
-    QCustomPlot(parent)
+ChartWidget::ChartWidget(QCustomPlot *parent) 
+    : QCustomPlot(parent)
 {
     setupChart(this);
 
     this->rescaleAxes();
     this->replot();
+
+
 }
 
 ChartWidget::~ChartWidget()
@@ -80,6 +82,8 @@ void ChartWidget::setThemeBackground(const QColor &brush)
         this->yAxis->setLabelColor(Qt::black);
         this->yAxis->setTickPen(QPen(Qt::black));
         this->yAxis->setSubTickPen(QPen(Qt::black));
+
+        m_cursorColor = QPen(Qt::black);
     }
     else
     {
@@ -96,10 +100,62 @@ void ChartWidget::setThemeBackground(const QColor &brush)
         this->yAxis->setLabelColor(Qt::white);
         this->yAxis->setTickPen(QPen(Qt::white));
         this->yAxis->setSubTickPen(QPen(Qt::white));
+
+        m_cursorColor = QPen(Qt::yellow);
     }
 
 
     this->replot();
+}
+
+void ChartWidget::enableCursor(bool enable)
+{
+    m_cursorEnable = enable;
+
+    if (enable)
+    {
+        m_hCursor = new QCPItemLine(this);
+        m_vCursor = new QCPItemLine(this);
+
+        m_hCursor->setPen(m_cursorColor);
+        m_vCursor->setPen(m_cursorColor);
+
+        m_hCursor->start->setCoords(-QCPRange::maxRange, m_vPos);
+        m_hCursor->end->setCoords(QCPRange::maxRange, m_vPos);
+
+        m_vCursor->start->setCoords(m_hPos,  -QCPRange::maxRange);
+        m_vCursor->end->setCoords(m_hPos, QCPRange::maxRange);
+    }
+    else
+    {
+        removeItem(m_hCursor);
+        removeItem(m_vCursor);
+    }
+
+    this->replot();
+
+}
+
+void ChartWidget::setVCursor(int position)
+{
+    m_vPos = position;
+
+    if (m_cursorEnable)
+    {
+        enableCursor(false);
+        enableCursor(true);
+    }
+}
+
+void ChartWidget::setHCursor(int position)
+{
+    m_hPos = position;
+
+    if (m_cursorEnable)
+    {
+        enableCursor(false);
+        enableCursor(true);
+    }
 }
 
 void ChartWidget::changeVisablilty(int graph, bool state)

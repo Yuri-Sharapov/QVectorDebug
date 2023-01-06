@@ -14,13 +14,17 @@ SOURCES += \
     src/mainwindow.cpp \
     src/port.cpp \
     src/wave_generator.cpp \
+    src/common/maths.cpp \
     libs/qcustomplot/qcustomplot.cpp
 
 HEADERS += \
     src/chart_widget.h \
+    src/common/maths.h \
     src/mainwindow.h \
     src/port.h \
     src/wave_generator.h \
+    src/platform.h \
+    src/build_config.h \
     libs/qcustomplot/qcustomplot.h \
 
 FORMS += \

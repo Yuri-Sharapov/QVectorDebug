@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
     , m_pUi(new Ui::MainWindow)
     , m_pPort(new Port)
     , m_pChart(new ChartWidget)
+    , m_pTxThread(new TxThread)
+    , m_pGenerator(new WaveGenerator(WaveGenerator::TYPE_SINUS))
     , m_pSettings(new QSettings("settings.ini",QSettings::IniFormat))
 {
     m_pUi->setupUi(this);
@@ -59,6 +61,21 @@ MainWindow::MainWindow(QWidget *parent)
     m_pUi->leSendVar_1->setEnabled(true);
     m_pUi->leSendVar_2->setEnabled(true);
 
+    // setup limits
+    m_pUi->spinAmplitude->setMinimum(1);
+    m_pUi->spinAmplitude->setMaximum(0xFFFF);
+    m_pUi->spinConfigRatio->setMinimum(1);
+    m_pUi->spinConfigRatio->setMaximum(0xFFFF);
+    m_pUi->spinOffset->setMinimum(1);
+    m_pUi->spinOffset->setMaximum(0xFFFF);
+    m_pUi->spinFrequency->setMinimum(1);
+    m_pUi->spinFrequency->setMaximum(100);
+    m_pUi->spinCursorX->setMinimum(-32767);
+    m_pUi->spinCursorX->setMaximum(32767);
+
+    // connect tx thread
+    connect(m_pTxThread, &TxThread::newData, this, &MainWindow::on_newTxData);
+    m_pTxThread->setGenerator(*m_pGenerator);
 
     m_paletteWhite = qApp->palette();
 
@@ -94,6 +111,7 @@ MainWindow::~MainWindow()
     delete m_pUi;
     delete m_pPort;
     delete m_pChart;
+    delete m_pGenerator;
     delete m_pSettings;
     delete m_pStatus;
 }
@@ -386,6 +404,12 @@ void MainWindow::restoreSettings()
     // port name and baudrate
     m_pUi->cbBaudrate->setCurrentIndex(m_pSettings->value("port/baudrate").toInt());
     m_pUi->cbPort->setCurrentIndex(m_pSettings->value("port/name").toInt());
+
+    // waveform generator
+    m_pUi->spinConfigRatio->setValue(static_cast<int>(m_pGenerator->getAmplitudeRatio()));
+    m_pUi->spinAmplitude->setValue(static_cast<int>(m_pGenerator->getAmplitude()));
+    m_pUi->spinFrequency->setValue(static_cast<int>(m_pGenerator->getFrequency()));
+    m_pUi->spinOffset->setValue(static_cast<int>(m_pGenerator->getOffset()));
 }
 
 void MainWindow::saveSettings()
@@ -471,3 +495,92 @@ void MainWindow::on_actionWhite_toggled(bool arg1)
         m_pUi->actionWhite->setChecked(arg1);
     }
 }
+
+void MainWindow::on_btnStart_clicked()
+{
+    int amplitude, frequency, offset, ratio;
+    amplitude   = m_pUi->spinAmplitude->value();
+    frequency   = m_pUi->spinFrequency->value();
+    offset      = m_pUi->spinOffset->value();
+    ratio       = m_pUi->spinConfigRatio->value();
+
+    m_pGenerator->setAmplitude(static_cast<float>(amplitude));
+    m_pGenerator->setFrequency(static_cast<float>(frequency));
+    m_pGenerator->setOffset(static_cast<float>(offset));
+    m_pGenerator->setAmplitudeRatio(static_cast<float>(ratio));
+
+    if (m_pTxThread->isActive())
+    {
+        m_pTxThread->stopThread();
+        m_pUi->btnStart->setText("Start");
+        qDebug() << "Stop";
+    }
+    else
+    {
+        if (!m_pTxThread->isRunning())
+            m_pTxThread->start();
+
+        m_pTxThread->setGenerator(*m_pGenerator);
+        m_pTxThread->startThread();
+        m_pChart->startChart();
+        m_pUi->btnStart->setText("Stop");
+        qDebug() << "Start";
+    }
+
+}
+
+void MainWindow::on_newTxData()
+{
+    qDebug() << "time: " << m_pTxThread->getTime();
+
+    int16_t iOut = (int16_t)m_pTxThread->getOutput();
+    qDebug() << "output: " << iOut;
+
+    uint64_t timeUpdate = m_pTxThread->getTime();
+    m_pChart->appendData(m_pTxThread->getTime(), iOut, (int16_t)0, (int16_t)0, (int16_t)0);
+
+    if (timeUpdate - m_lastTimeUpdate > 10000000)
+    {
+        m_pChart->updateChart();
+        m_lastTimeUpdate = timeUpdate;
+    }
+
+}
+
+
+void TxThread::run()
+{
+    while (1)
+    {
+        if (m_isRun)
+        {
+            m_generator.update();
+            emit newData();
+            msleep(1);
+        }
+        else
+        {
+            msleep(1000);
+        }
+    }
+}
+
+void MainWindow::on_cbCursorEnable_stateChanged(int arg1)
+{
+    m_pChart->setHCursor(m_pUi->spinCursorX->value());
+    m_pChart->setVCursor(m_pUi->spinCursorY->value());
+    m_pChart->enableCursor(arg1 == 0 ? false : true);
+}
+
+
+void MainWindow::on_spinCursorX_valueChanged(int arg1)
+{
+    m_pChart->setHCursor(m_pUi->spinCursorX->value());
+}
+
+
+void MainWindow::on_spinCursorY_valueChanged(int arg1)
+{
+    m_pChart->setVCursor(m_pUi->spinCursorY->value());
+}
+

@@ -34,6 +34,10 @@ public:
     void updateChart(void);
 
     void setThemeBackground(const QColor &brush);
+
+    void enableCursor(bool enable);
+    void setVCursor(int position);
+    void setHCursor(int position);
 public slots:
     void changeVisablilty(int graph, bool state);
 private:
@@ -45,4 +49,13 @@ private slots:
     void plotSelectionChanged();
     void plotDoubleClicked(QMouseEvent *event);
     void plotChangeRangeAll(const QCPRange &range);
+private:
+    bool            m_cursorEnable = false;
+    QCPItemLine*    m_hCursor;
+    QCPItemLine*    m_vCursor;
+    QPen            m_cursorColor;
+
+    int16_t         m_hPos = 0;
+    int16_t         m_vPos = 0;
+
 };

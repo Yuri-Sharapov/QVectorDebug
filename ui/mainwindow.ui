@@ -122,7 +122,7 @@
            <item>
             <widget class="QTabWidget" name="tabWidget">
              <property name="currentIndex">
-              <number>0</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="tab">
               <attribute name="title">
@@ -148,7 +148,7 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset resource="res.qrc">
+                      <iconset resource="../res.qrc">
                        <normaloff>:/icons/red-circle.png</normaloff>:/icons/red-circle.png</iconset>
                      </property>
                      <property name="iconSize">
@@ -199,7 +199,7 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset resource="res.qrc">
+                      <iconset resource="../res.qrc">
                        <normaloff>:/icons/blue-circle.png</normaloff>:/icons/blue-circle.png</iconset>
                      </property>
                      <property name="iconSize">
@@ -250,7 +250,7 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset resource="res.qrc">
+                      <iconset resource="../res.qrc">
                        <normaloff>:/icons/green-circle.png</normaloff>:/icons/green-circle.png</iconset>
                      </property>
                      <property name="iconSize">
@@ -301,7 +301,7 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset resource="res.qrc">
+                      <iconset resource="../res.qrc">
                        <normaloff>:/icons/yellow-circle.png</normaloff>:/icons/yellow-circle.png</iconset>
                      </property>
                      <property name="iconSize">
@@ -533,22 +533,31 @@
                <item>
                 <layout class="QHBoxLayout" name="layCursor">
                  <item>
-                  <widget class="QSpinBox" name="spinBox">
+                  <widget class="QSpinBox" name="spinCursorX">
                    <property name="minimumSize">
                     <size>
                      <width>50</width>
                      <height>0</height>
                     </size>
                    </property>
+                   <property name="minimum">
+                    <number>-32767</number>
+                   </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_2">
+                  <widget class="QSpinBox" name="spinCursorY">
                    <property name="minimumSize">
                     <size>
                      <width>50</width>
                      <height>0</height>
                     </size>
+                   </property>
+                   <property name="minimum">
+                    <number>-32767</number>
+                   </property>
+                   <property name="maximum">
+                    <number>32767</number>
                    </property>
                   </widget>
                  </item>
@@ -577,6 +586,13 @@
                   </widget>
                  </item>
                 </layout>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="cbCursorEnable">
+                 <property name="text">
+                  <string>Enable</string>
+                 </property>
+                </widget>
                </item>
                <item>
                 <spacer name="verticalSpacer_3">
@@ -613,6 +629,9 @@
                      <width>200</width>
                      <height>30</height>
                     </size>
+                   </property>
+                   <property name="maximum">
+                    <number>32767</number>
                    </property>
                   </widget>
                  </item>
@@ -742,7 +761,7 @@
   </action>
  </widget>
  <resources>
-  <include location="res.qrc"/>
+  <include location="../res.qrc"/>
  </resources>
  <connections/>
 </ui>

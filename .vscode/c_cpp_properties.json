@@ -5,7 +5,9 @@
             "includePath": [
                 "C:/Qt/5.12.12/mingw73_64/include/**",
                 "${workspaceFolder}/**",
-                "../build-QVectorDebug-Desktop_Qt_5_12_12_MinGW_64_bit-Release"
+                "${workspaceFolder}/src/",
+                "${workspaceFolder}/src/libs/**",
+                "../build-QVectorDebug-Desktop_Qt_5_12_12_MinGW_64_bit-Debug"
             ],
             "defines": [],
             "compilerPath": "C:/Qt/5.12.12/mingw73_64/bin",

@@ -5,6 +5,7 @@
 
 #include <QElapsedTimer>
 #include <QSettings>
+#include <QMutex>
 /*
  * This file is part of the QVectorDebug (https://github.com/Yuri-Sharapov/QVectorDebug).
  * Copyright (c) 2022 Yuri Sharapov.
@@ -24,13 +25,13 @@
 
 class WaveGenerator
 {
+public:
     enum waveType_e
     {
         TYPE_SQUARE,
         TYPE_SINUS
     };
 
-public:
     WaveGenerator(waveType_e type = TYPE_SQUARE);
     ~WaveGenerator();
 
@@ -43,6 +44,9 @@ public:
     float       getAmplitude(void)              {return m_amplitude;}
     float       getAmplitudeRatio(void)         {return m_amplitudeRadio;}
     float       getOffset(void)                 {return m_offset;}
+    float       getOutput(void)                 {return m_output;}
+    uint64_t    getTime(void);
+
 
     void        setType(waveType_e type)        {m_currentType = type;}
     void        setFrequency(float val)         {m_frequency = val;}
@@ -61,9 +65,12 @@ private:
     float       m_offset            = 0;
     waveType_e  m_currentType;
 
+    float       m_output;
+
     QElapsedTimer   m_timer;
+    uint64_t        m_timeNs;
     uint64_t        m_timeNsPrevious;
     bool            m_isOn          = false;
-
+    uint32_t        m_counter;
     QSettings*      m_pConfig;
 };
