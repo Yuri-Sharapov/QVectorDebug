@@ -21,6 +21,7 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QStyleFactory>
+#include <QElapsedTimer>
 
 #include "chart_widget.h"
 #include "port.h"

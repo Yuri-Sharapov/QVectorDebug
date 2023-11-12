@@ -76,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent)
     // connect tx thread
     connect(m_pTxThread, &TxThread::newData, this, &MainWindow::on_newTxData);
     m_pTxThread->setGenerator(*m_pGenerator);
+    m_pTxThread->setPriority(QThread::Priority::HighestPriority);
 
     m_paletteWhite = qApp->palette();
 
@@ -531,10 +532,10 @@ void MainWindow::on_btnStart_clicked()
 
 void MainWindow::on_newTxData()
 {
-    qDebug() << "time: " << m_pTxThread->getTime();
+    //qDebug() << "time: " << m_pTxThread->getTime();
 
     int16_t iOut = (int16_t)m_pTxThread->getOutput();
-    qDebug() << "output: " << iOut;
+    //qDebug() << "output: " << iOut;
 
     uint64_t timeUpdate = m_pTxThread->getTime();
     m_pChart->appendData(m_pTxThread->getTime(), iOut, (int16_t)0, (int16_t)0, (int16_t)0);
@@ -550,17 +551,33 @@ void MainWindow::on_newTxData()
 
 void TxThread::run()
 {
+    QElapsedTimer updateTimer;
+    QElapsedTimer runTimer;
+    uint64_t updateTimeNs = 0;
+    uint64_t runTimeNs = 0;
+
     while (1)
     {
         if (m_isRun)
         {
+            updateTimer.start();
+
             m_generator.update();
             emit newData();
-            msleep(1);
+            updateTimeNs = updateTimer.nsecsElapsed();
+
+            runTimer.start();
+            if (updateTimeNs/1000 < 100)
+                usleep(100 - updateTimeNs / 1000);
+
+            runTimeNs = runTimer.elapsed();
+            qDebug() << "desired sleep time Us: " << 100 - updateTimeNs / 1000;
+            qDebug() << "updateTimeUs: " << updateTimeNs / 1000;
+            qDebug() << "runTimeUs: " << runTimeNs ;
         }
         else
         {
-            msleep(1000);
+            msleep(10);
         }
     }
 }

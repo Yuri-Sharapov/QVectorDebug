@@ -38,32 +38,30 @@ void WaveGenerator::update()
         return;
 
     m_timeNs = m_timer.nsecsElapsed();
-    qDebug() << "time(wg): " << m_timeNs;
+    //qDebug() << "time(wg): " << m_timeNs;
     uint64_t timeDelta = m_timeNs - m_timeNsPrevious;
 
-    float period = 1.0f / (m_frequency * 10);
+    float period = 1.0f / (m_frequency);
 
     if (timeDelta >= period * 1000000000.f)
         m_timeNsPrevious = m_timeNs;
 
     //float part = ((float)timeDelta / 1000000000.f)/period;
-    float part = ((float)m_counter / 1000.0f)/period;
+    float part = ((float)m_counter / 1000.0f) / period;
 
-    if (++m_counter > period * 1000)
+    if (++m_counter > period * 1000 - 1)
         m_counter = 0;
 
-    qDebug() << "period: " << period;
-    qDebug() << "part: " << part;
+    //qDebug() << "period: " << period;
+    //qDebug() << "part: " << part;
 
-    m_output = m_amplitude * m_amplitudeRadio * math::sin_approx(2.0f * M_PIf * part);
+    m_output = m_amplitude * m_amplitudeRadio * math::sin_approx(part * 2 * M_PIf );
 
 }
 
 uint64_t WaveGenerator::getTime()
 {
-    uint64_t retTime;
-    retTime = m_timeNs;
-    return retTime;
+    return m_timeNs;
 }
 
 void WaveGenerator::configCreate(const QString name, float value)
