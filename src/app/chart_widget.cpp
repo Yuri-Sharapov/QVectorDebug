@@ -25,8 +25,6 @@ ChartWidget::ChartWidget(QCustomPlot *parent)
 
     this->rescaleAxes();
     this->replot();
-
-
 }
 
 ChartWidget::~ChartWidget()
@@ -35,11 +33,20 @@ ChartWidget::~ChartWidget()
 
 void ChartWidget::appendData(qint64 time, int16_t data0, int16_t data1, int16_t data2, int16_t data3)
 {
-
     this->graph(0)->addData(time/1000000U, data0);
     this->graph(1)->addData(time/1000000U, data1);
     this->graph(2)->addData(time/1000000U, data2);
     this->graph(3)->addData(time/1000000U, data3);
+}
+
+void ChartWidget::appendData(int16_t data0, int16_t data1, int16_t data2, int16_t data3)
+{
+
+    this->graph(0)->addData(m_timeStep, data0);
+    this->graph(1)->addData(m_timeStep, data1);
+    this->graph(2)->addData(m_timeStep, data2);
+    this->graph(3)->addData(m_timeStep, data3);
+    m_timeStep++;
 }
 
 void ChartWidget::appendData(qint64 time, uint16_t data0, uint16_t data1, uint16_t data2, uint16_t data3)
@@ -57,6 +64,7 @@ void ChartWidget::startChart()
     this->graph(1)->data()->clear();
     this->graph(2)->data()->clear();
     this->graph(3)->data()->clear();
+    m_timeStep = 0;
 }
 
 void ChartWidget::updateChart()

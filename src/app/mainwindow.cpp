@@ -119,7 +119,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4)
 {
-    m_pChart->appendData(timeNs, var1, var2, var3, var4);
+    Q_UNUSED(timeNs);
+    m_pChart->appendData(var1, var2, var3, var4);
     m_pChart->updateChart();
 }
 
@@ -265,6 +266,7 @@ void MainWindow::serialSetup(void)
     m_pUi->cbBaudrate->addItem(QStringLiteral("38400"), QSerialPort::Baud38400);
     m_pUi->cbBaudrate->addItem(QStringLiteral("57600"), QSerialPort::Baud57600);
     m_pUi->cbBaudrate->addItem(QStringLiteral("115200"), QSerialPort::Baud115200);
+    m_pUi->cbBaudrate->addItem(QStringLiteral("230400"), 230400);
     m_pUi->cbBaudrate->addItem(tr("Custom"));
     m_pUi->cbBaudrate->setCurrentIndex(0);
 
@@ -330,18 +332,19 @@ void MainWindow::openChart(QVector<Port::ChartVar> *pVars)
     qint64 timePrevNs = 0;
     for(Port::ChartVar var : *pVars)
     {
-        if (timePrevNs == 0)
-        {
-            timePrevNs = var.timeNs;
-            m_pChart->appendData(var.timeNs, var.data[0], var.data[1], var.data[2], var.data[3]);
-        }
-        else
-        {
-            if (timePrevNs/1000000U != var.timeNs/1000000U)
-                m_pChart->appendData(var.timeNs, var.data[0], var.data[1], var.data[2], var.data[3]);
-
-            timePrevNs = var.timeNs;
-        }
+        //if (timePrevNs == 0)
+        //{
+        //    timePrevNs = var.timeNs;
+        //    m_pChart->appendData(var.timeNs, var.data[0], var.data[1], var.data[2], var.data[3]);
+        //}
+        //else
+        //{
+        //    if (timePrevNs/1000000U != var.timeNs/1000000U)
+        //        m_pChart->appendData(var.timeNs, var.data[0], var.data[1], var.data[2], var.data[3]);
+//
+        //    timePrevNs = var.timeNs;
+        //}
+        m_pChart->appendData(var.data[0], var.data[1], var.data[2], var.data[3]);
 
     }
     m_pChart->updateChart();
@@ -394,12 +397,12 @@ void MainWindow::restoreSettings()
     m_pPort->setProtocolType(static_cast<Port::ProcotolType>(m_pSettings->value("port/protocol").toInt()));
     if (m_pPort->getProtocolType() == Port::ProcotolType::TYPE_CLASSIC)
     {
-        m_pUi->actionClassic->setChecked(true);
+        m_pUi->actionSerialVector->setChecked(true);
         m_pUi->actionTdfp->setChecked(false);
     }
     else
     {
-        m_pUi->actionClassic->setChecked(false);
+        m_pUi->actionSerialVector->setChecked(false);
         m_pUi->actionTdfp->setChecked(true);
     }
     // port name and baudrate
@@ -463,7 +466,7 @@ void MainWindow::on_actionTdfp_toggled(bool arg1)
 {
     if (arg1)
     {
-        m_pUi->actionClassic->setChecked(!arg1);
+        m_pUi->actionSerialVector->setChecked(!arg1);
         m_pPort->setProtocolType(Port::ProcotolType::TYPE_TDFP);
     }
 }
@@ -599,5 +602,11 @@ void MainWindow::on_spinCursorX_valueChanged(int arg1)
 void MainWindow::on_spinCursorY_valueChanged(int arg1)
 {
     m_pChart->setVCursor(m_pUi->spinCursorY->value());
+}
+
+
+void MainWindow::on_actionClassic_triggered()
+{
+
 }
 

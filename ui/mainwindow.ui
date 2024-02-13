@@ -122,11 +122,11 @@
            <item>
             <widget class="QTabWidget" name="tabWidget">
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="tab">
               <attribute name="title">
-               <string>Static</string>
+               <string>Variables</string>
               </attribute>
               <layout class="QVBoxLayout" name="verticalLayout_4">
                <property name="bottomMargin">
@@ -375,7 +375,7 @@
              </widget>
              <widget class="QWidget" name="tab_2">
               <attribute name="title">
-               <string>Nyquist</string>
+               <string>Generator</string>
               </attribute>
               <layout class="QVBoxLayout" name="verticalLayout_9">
                <item>
@@ -689,8 +689,8 @@
      <property name="title">
       <string>Protocol</string>
      </property>
-     <addaction name="actionClassic"/>
-     <addaction name="actionTdfp"/>
+     <addaction name="actionSerialVector"/>
+     <addaction name="actionVS_CAN"/>
     </widget>
     <widget class="QMenu" name="menuTheme">
      <property name="title">
@@ -721,7 +721,7 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionClassic">
+  <action name="actionSerialVector">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -729,7 +729,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Classic</string>
+    <string>Serial Vect</string>
    </property>
   </action>
   <action name="actionTdfp">
@@ -740,7 +740,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Tdfp</string>
+    <string>Serial ASCII</string>
    </property>
   </action>
   <action name="actionWhite">
@@ -757,6 +757,22 @@
    </property>
    <property name="text">
     <string>Black</string>
+   </property>
+  </action>
+  <action name="actionVS_CAN">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>VS-CAN</string>
+   </property>
+  </action>
+  <action name="actionSLCAN">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>SLCAN</string>
    </property>
   </action>
  </widget>

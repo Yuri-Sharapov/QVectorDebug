@@ -9,23 +9,25 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    src/chart_widget.cpp \
-    src/main.cpp \
-    src/mainwindow.cpp \
-    src/port.cpp \
-    src/wave_generator.cpp \
+    libs/qcustomplot/qcustomplot.cpp \
     src/common/maths.cpp \
-    libs/qcustomplot/qcustomplot.cpp
+    src/modules/wave_generator/wave_generator.cpp \
+    src/app/chart_widget.cpp \
+    src/app/mainwindow.cpp \
+    src/app/port.cpp \    
+    src/main.cpp
+
+INCLUDEPATH += $$PWD/src/
 
 HEADERS += \
-    src/chart_widget.h \
+    libs/qcustomplot/qcustomplot.h \
     src/common/maths.h \
-    src/mainwindow.h \
-    src/port.h \
-    src/wave_generator.h \
+    src/modules/wave_generator/wave_generator.h \
+    src/app/chart_widget.h \
+    src/app/mainwindow.h \
+    src/app/port.h \
     src/platform.h \
     src/build_config.h \
-    libs/qcustomplot/qcustomplot.h \
 
 FORMS += \
     ui/mainwindow.ui

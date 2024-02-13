@@ -28,6 +28,7 @@ public:
     ~ChartWidget();
 
     void appendData(qint64 time, int16_t data0, int16_t data1, int16_t data2, int16_t data3);
+    void appendData(int16_t data0, int16_t data1, int16_t data2, int16_t data3);
     void appendData(qint64 time, uint16_t data0, uint16_t data1, uint16_t data2, uint16_t data3);
 
     void startChart(void);
@@ -55,7 +56,7 @@ private:
     QCPItemLine*    m_vCursor;
     QPen            m_cursorColor;
 
-    int16_t         m_hPos = 0;
-    int16_t         m_vPos = 0;
-
+    int             m_hPos = 0;
+    int             m_vPos = 0;
+    int             m_timeStep = 0;
 };

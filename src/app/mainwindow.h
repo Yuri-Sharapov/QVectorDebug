@@ -25,7 +25,7 @@
 
 #include "chart_widget.h"
 #include "port.h"
-#include "wave_generator.h"
+#include "modules/wave_generator/wave_generator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -125,6 +125,8 @@ private slots:
     void on_spinCursorX_valueChanged(int arg1);
 
     void on_spinCursorY_valueChanged(int arg1);
+
+    void on_actionClassic_triggered();
 
 private:
     void showStatusMessage(const QString &message);
