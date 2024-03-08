@@ -58,12 +58,32 @@ void ChartWidget::appendData(qint64 time, uint16_t data0, uint16_t data1, uint16
     this->graph(3)->addData(time/1000000U, data3);
 }
 
+void ChartWidget::appendData(int voltage, int current, int ppm, int rpm, int position, int currentA, int currentB)
+{
+    this->graph(0)->addData(m_timeStep, voltage);
+    this->graph(1)->addData(m_timeStep, current);
+    this->graph(2)->addData(m_timeStep, current * voltage / 10);
+    this->graph(3)->addData(m_timeStep, ppm);
+    this->graph(4)->addData(m_timeStep, rpm);
+    this->graph(5)->addData(m_timeStep, position);
+    this->graph(6)->addData(m_timeStep, currentA);
+    this->graph(7)->addData(m_timeStep, currentB);
+    this->graph(8)->addData(m_timeStep, -currentA - currentB);
+    m_timeStep++;
+}
+
+
 void ChartWidget::startChart()
 {
     this->graph(0)->data()->clear();
     this->graph(1)->data()->clear();
     this->graph(2)->data()->clear();
     this->graph(3)->data()->clear();
+    this->graph(4)->data()->clear();
+    this->graph(5)->data()->clear();
+    this->graph(6)->data()->clear();
+    this->graph(7)->data()->clear();
+    this->graph(8)->data()->clear();
     m_timeStep = 0;
 }
 
@@ -201,6 +221,28 @@ void ChartWidget::setupChart(QCustomPlot *pChart)
     pChart->addGraph();                                                             // add Graph 1
     pChart->graph(3)->setPen(QPen(Qt::yellow));
     pChart->graph(3)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
+    pChart->addGraph();
+    pChart->graph(4)->setPen(QPen(Qt::cyan));
+    pChart->graph(4)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
+    pChart->addGraph();
+    pChart->graph(5)->setPen(QPen(Qt::gray));
+    pChart->graph(5)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
+    pChart->addGraph();
+    pChart->graph(6)->setPen(QPen(Qt::magenta));
+    pChart->graph(6)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
+    pChart->addGraph();
+    pChart->graph(7)->setPen(QPen(Qt::magenta));
+    pChart->graph(7)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
+    pChart->addGraph();
+    pChart->graph(8)->setPen(QPen(Qt::darkMagenta));
+    pChart->graph(8)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
+    pChart->addGraph();
+
+    for (int i = 0; i < pChart->graphCount(); i++)
+    {
+        pChart->graph(i)->setVisible(false);
+    }
+
 
     pChart->setInteraction(QCP::iRangeDrag, true);
     pChart->setInteraction(QCP::iRangeZoom, true);

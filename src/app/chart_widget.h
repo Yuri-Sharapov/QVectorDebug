@@ -31,6 +31,9 @@ public:
     void appendData(int16_t data0, int16_t data1, int16_t data2, int16_t data3);
     void appendData(qint64 time, uint16_t data0, uint16_t data1, uint16_t data2, uint16_t data3);
 
+    void appendData(int voltage, int current, int ppm, int rpm, int position, int currentA, int currentB);
+
+
     void startChart(void);
     void updateChart(void);
 

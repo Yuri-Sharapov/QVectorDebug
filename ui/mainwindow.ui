@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>743</height>
+    <width>1008</width>
+    <height>828</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -126,7 +126,7 @@
              </property>
              <widget class="QWidget" name="tab">
               <attribute name="title">
-               <string>Variables</string>
+               <string>Vector</string>
               </attribute>
               <layout class="QVBoxLayout" name="verticalLayout_4">
                <property name="bottomMargin">
@@ -375,139 +375,229 @@
              </widget>
              <widget class="QWidget" name="tab_2">
               <attribute name="title">
-               <string>Generator</string>
+               <string>FEsc</string>
               </attribute>
-              <layout class="QVBoxLayout" name="verticalLayout_9">
+              <layout class="QVBoxLayout" name="verticalLayout_5">
                <item>
-                <widget class="QLabel" name="lblConfig">
-                 <property name="text">
-                  <string>Configuration</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="lblConfig_2">
-                 <item>
-                  <widget class="QLabel" name="lblConfigRatio">
-                   <property name="text">
-                    <string>Ampl. Ratio</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="spinConfigRatio">
-                   <property name="minimumSize">
-                    <size>
-                     <width>50</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>200</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <widget class="Line" name="line_2">
+                <widget class="Line" name="line_3">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="lblInput">
-                 <property name="text">
-                  <string>Input</string>
+                <widget class="QLabel" name="label">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>20</height>
+                  </size>
                  </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                 <property name="text">
+                  <string>Standard</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="layFrequency">
+                <widget class="Line" name="line_4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout">
                  <item>
-                  <widget class="QLabel" name="lblFrequency">
+                  <widget class="QCheckBox" name="cbEscTemp">
                    <property name="text">
-                    <string>Frequency</string>
+                    <string>Temperature</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinFrequency">
+                  <widget class="QFrame" name="frame">
                    <property name="minimumSize">
                     <size>
-                     <width>50</width>
-                     <height>20</height>
+                     <width>30</width>
+                     <height>30</height>
                     </size>
                    </property>
                    <property name="maximumSize">
                     <size>
-                     <width>200</width>
+                     <width>30</width>
                      <height>30</height>
                     </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
                    </property>
                   </widget>
                  </item>
                 </layout>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="layAmplitude">
+                <layout class="QHBoxLayout" name="horizontalLayout_3">
                  <item>
-                  <widget class="QLabel" name="lblAmplitude">
+                  <widget class="QCheckBox" name="cbEscVoltage">
                    <property name="text">
-                    <string>Amplitude</string>
+                    <string>Input Voltage</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinAmplitude">
+                  <widget class="QFrame" name="frame_2">
                    <property name="minimumSize">
                     <size>
-                     <width>50</width>
-                     <height>20</height>
+                     <width>30</width>
+                     <height>30</height>
                     </size>
                    </property>
                    <property name="maximumSize">
                     <size>
-                     <width>200</width>
+                     <width>30</width>
                      <height>30</height>
                     </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
                    </property>
                   </widget>
                  </item>
                 </layout>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="layOffset">
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
                  <item>
-                  <widget class="QLabel" name="lblOffset">
+                  <widget class="QCheckBox" name="cbEscCurrent">
                    <property name="text">
-                    <string>Offset</string>
+                    <string>Input Current</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinOffset">
+                  <widget class="QFrame" name="frame_3">
                    <property name="minimumSize">
                     <size>
-                     <width>50</width>
-                     <height>20</height>
+                     <width>30</width>
+                     <height>30</height>
                     </size>
                    </property>
                    <property name="maximumSize">
                     <size>
-                     <width>200</width>
+                     <width>30</width>
                      <height>30</height>
                     </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <item>
+                  <widget class="QCheckBox" name="cbEscPower">
+                   <property name="text">
+                    <string>Consumption (Calculated)</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QFrame" name="frame_4">
+                   <property name="minimumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_6">
+                 <item>
+                  <widget class="QCheckBox" name="cbEscPpm">
+                   <property name="text">
+                    <string>PPM</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QFrame" name="frame_5">
+                   <property name="minimumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_7">
+                 <item>
+                  <widget class="QCheckBox" name="cbEscRpm">
+                   <property name="text">
+                    <string>RPM</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QFrame" name="frame_6">
+                   <property name="minimumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
                    </property>
                   </widget>
                  </item>
@@ -521,81 +611,159 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="lblCursor">
-                 <property name="text">
-                  <string>Cursor</string>
+                <widget class="QLabel" name="label_2">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>20</height>
+                  </size>
                  </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                 <property name="text">
+                  <string>Extended</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="layCursor">
+                <widget class="Line" name="line_2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_8">
                  <item>
-                  <widget class="QSpinBox" name="spinCursorX">
-                   <property name="minimumSize">
-                    <size>
-                     <width>50</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="minimum">
-                    <number>-32767</number>
+                  <widget class="QCheckBox" name="cbEscPos">
+                   <property name="text">
+                    <string>Position</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinCursorY">
+                  <widget class="QFrame" name="frame_7">
                    <property name="minimumSize">
                     <size>
-                     <width>50</width>
-                     <height>0</height>
+                     <width>30</width>
+                     <height>30</height>
                     </size>
                    </property>
-                   <property name="minimum">
-                    <number>-32767</number>
+                   <property name="maximumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
                    </property>
-                   <property name="maximum">
-                    <number>32767</number>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
                    </property>
                   </widget>
                  </item>
                 </layout>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="layCursorLbl">
+                <layout class="QHBoxLayout" name="horizontalLayout_9">
                  <item>
-                  <widget class="QLabel" name="lblCursorY">
+                  <widget class="QCheckBox" name="cbEscCA">
                    <property name="text">
-                    <string>X axis</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <string>CurrentA</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLabel" name="lblCursorX">
-                   <property name="text">
-                    <string>Y axis</string>
+                  <widget class="QFrame" name="frame_8">
+                   <property name="minimumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
                    </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                   <property name="maximumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
                    </property>
                   </widget>
                  </item>
                 </layout>
                </item>
                <item>
-                <widget class="QCheckBox" name="cbCursorEnable">
-                 <property name="text">
-                  <string>Enable</string>
-                 </property>
-                </widget>
+                <layout class="QHBoxLayout" name="horizontalLayout_10">
+                 <item>
+                  <widget class="QCheckBox" name="cbEscCB">
+                   <property name="text">
+                    <string>CurrentB</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QFrame" name="frame_9">
+                   <property name="minimumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
                <item>
-                <spacer name="verticalSpacer_3">
+                <layout class="QHBoxLayout" name="horizontalLayout_11">
+                 <item>
+                  <widget class="QCheckBox" name="cbEscCC">
+                   <property name="text">
+                    <string>CurrentC (Calculated)</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QFrame" name="frame_10">
+                   <property name="minimumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_2">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
                  </property>
@@ -606,43 +774,6 @@
                   </size>
                  </property>
                 </spacer>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="layPeriod">
-                 <item>
-                  <widget class="QLabel" name="lblPeriod">
-                   <property name="text">
-                    <string>Period</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="spinPeriod">
-                   <property name="minimumSize">
-                    <size>
-                     <width>50</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>200</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="maximum">
-                    <number>32767</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <widget class="QPushButton" name="btnStart">
-                 <property name="text">
-                  <string>Start</string>
-                 </property>
-                </widget>
                </item>
               </layout>
              </widget>
@@ -665,7 +796,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1008</width>
      <height>21</height>
     </rect>
    </property>
@@ -689,8 +820,8 @@
      <property name="title">
       <string>Protocol</string>
      </property>
-     <addaction name="actionSerialVector"/>
-     <addaction name="actionVS_CAN"/>
+     <addaction name="actionUartVector"/>
+     <addaction name="actionFEsc"/>
     </widget>
     <widget class="QMenu" name="menuTheme">
      <property name="title">
@@ -721,7 +852,7 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionSerialVector">
+  <action name="actionUartVector">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -729,18 +860,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Serial Vect</string>
-   </property>
-  </action>
-  <action name="actionTdfp">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Serial ASCII</string>
+    <string>UART Vector</string>
    </property>
   </action>
   <action name="actionWhite">
@@ -759,20 +879,12 @@
     <string>Black</string>
    </property>
   </action>
-  <action name="actionVS_CAN">
+  <action name="actionFEsc">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>VS-CAN</string>
-   </property>
-  </action>
-  <action name="actionSLCAN">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>SLCAN</string>
+    <string>FEsc</string>
    </property>
   </action>
  </widget>

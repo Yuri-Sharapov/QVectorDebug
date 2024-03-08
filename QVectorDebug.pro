@@ -10,8 +10,6 @@ CONFIG += c++11
 
 SOURCES += \
     libs/qcustomplot/qcustomplot.cpp \
-    src/common/maths.cpp \
-    src/modules/wave_generator/wave_generator.cpp \
     src/app/chart_widget.cpp \
     src/app/mainwindow.cpp \
     src/app/port.cpp \    
@@ -21,13 +19,10 @@ INCLUDEPATH += $$PWD/src/
 
 HEADERS += \
     libs/qcustomplot/qcustomplot.h \
-    src/common/maths.h \
-    src/modules/wave_generator/wave_generator.h \
     src/app/chart_widget.h \
     src/app/mainwindow.h \
     src/app/port.h \
     src/platform.h \
-    src/build_config.h \
 
 FORMS += \
     ui/mainwindow.ui

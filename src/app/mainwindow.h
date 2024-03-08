@@ -25,61 +25,10 @@
 
 #include "chart_widget.h"
 #include "port.h"
-#include "modules/wave_generator/wave_generator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
-class TxThread : public QThread
-{
-    Q_OBJECT
-public:
-    void startThread(void)
-    {
-        m_mutex.lock();
-        m_isRun = true;
-        m_generator.start();
-        m_mutex.unlock();
-    }
-    void stopThread(void)
-    {
-        m_mutex.lock();
-        m_isRun = false;
-        m_generator.stop();
-        m_mutex.unlock();
-    }
-
-    bool isActive(void) {return m_isRun;}
-
-    void setGenerator(WaveGenerator& generator){m_generator = generator;}
-
-    float getOutput(void)
-    {
-        float output = 0;
-        m_mutex.lock();
-        output = m_generator.getOutput();
-        m_mutex.unlock();
-        return output;
-    }
-
-    uint64_t getTime(void)
-    {
-        uint64_t output = 0;
-        m_mutex.lock();
-        output = m_generator.getTime();
-        m_mutex.unlock();
-        return output;
-    }
-signals:
-    void newData(void);
-protected:
-    void run();
-private:
-    bool            m_isRun = false;
-    WaveGenerator   m_generator;
-    QMutex          m_mutex;
-};
 
 
 class MainWindow : public QMainWindow
@@ -111,22 +60,35 @@ private slots:
     void on_actionSave_triggered();
     void on_actionOpen_triggered();
 
-    void on_actionTdfp_toggled(bool arg1);
-    void on_actionClassic_toggled(bool arg1);
     void on_actionBlack_toggled(bool arg1);
     void on_actionWhite_toggled(bool arg1);
 
-    void on_btnStart_clicked();
 
-    void on_newTxData(void);
+    void on_actionUartVector_toggled(bool arg1);
 
-    void on_cbCursorEnable_stateChanged(int arg1);
+    void on_actionFEsc_toggled(bool arg1);
 
-    void on_spinCursorX_valueChanged(int arg1);
 
-    void on_spinCursorY_valueChanged(int arg1);
 
-    void on_actionClassic_triggered();
+    void on_cbEscTemp_stateChanged(int arg1);
+
+    void on_cbEscVoltage_stateChanged(int arg1);
+
+    void on_cbEscCurrent_stateChanged(int arg1);
+
+    void on_cbEscPower_stateChanged(int arg1);
+
+    void on_cbEscPpm_stateChanged(int arg1);
+
+    void on_cbEscRpm_stateChanged(int arg1);
+
+    void on_cbEscPos_stateChanged(int arg1);
+
+    void on_cbEscCA_stateChanged(int arg1);
+
+    void on_cbEscCB_stateChanged(int arg1);
+
+    void on_cbEscCC_stateChanged(int arg1);
 
 private:
     void showStatusMessage(const QString &message);
@@ -148,11 +110,9 @@ private:
     ChartWidget*    m_pChart = nullptr;
     QLabel*         m_pStatus = nullptr;
 
-    TxThread*       m_pTxThread;
-    WaveGenerator*  m_pGenerator;
-
     QSettings*      m_pSettings;
     ThemeSelector   m_uiTheme = THEME_WHITE;
+    Port::ProcotolType  m_protocol = Port::TYPE_VECTOR;
 
     QPalette        m_paletteWhite;
     QPalette        m_paletteBlack;
