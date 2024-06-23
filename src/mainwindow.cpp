@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -461,6 +460,8 @@ void MainWindow::on_actionBlack_toggled(bool arg1)
         m_uiTheme = THEME_BLACK;
         m_pUi->actionWhite->setChecked(!arg1);
         m_pUi->actionBlack->setChecked(arg1);
+        saveSettings();
+        qApp->exit(APP_RESTART_CODE);
     }
 }
 
@@ -471,6 +472,8 @@ void MainWindow::on_actionWhite_toggled(bool arg1)
         m_uiTheme = THEME_WHITE;
         m_pUi->actionBlack->setChecked(!arg1);
         m_pUi->actionWhite->setChecked(arg1);
+        saveSettings();
+        qApp->exit(APP_RESTART_CODE);
     }
 }
 

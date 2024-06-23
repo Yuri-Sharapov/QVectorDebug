@@ -209,40 +209,13 @@ void ChartWidget::setupChart(QCustomPlot *pChart)
     pChart->legend->setSelectedFont(legendFont);
     pChart->legend->setSelectableParts(QCPLegend::spItems); // legend box shall not be selectable, only legend items
 
-    pChart->addGraph();                                                             // add Graph 0
-    pChart->graph(0)->setPen(QPen(Qt::red));
-    pChart->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
-    pChart->addGraph();                                                             // add Graph 1
-    pChart->graph(1)->setPen(QPen(Qt::blue));
-    pChart->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
-    pChart->addGraph();                                                             // add Graph 1
-    pChart->graph(2)->setPen(QPen(Qt::green));
-    pChart->graph(2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
-    pChart->addGraph();                                                             // add Graph 1
-    pChart->graph(3)->setPen(QPen(Qt::yellow));
-    pChart->graph(3)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
-    pChart->addGraph();
-    pChart->graph(4)->setPen(QPen(Qt::cyan));
-    pChart->graph(4)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
-    pChart->addGraph();
-    pChart->graph(5)->setPen(QPen(Qt::gray));
-    pChart->graph(5)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
-    pChart->addGraph();
-    pChart->graph(6)->setPen(QPen(Qt::magenta));
-    pChart->graph(6)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
-    pChart->addGraph();
-    pChart->graph(7)->setPen(QPen(Qt::magenta));
-    pChart->graph(7)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
-    pChart->addGraph();
-    pChart->graph(8)->setPen(QPen(Qt::darkMagenta));
-    pChart->graph(8)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4)); // adding dots to graph
-    pChart->addGraph();
-
-    for (int i = 0; i < pChart->graphCount(); i++)
+    for (size_t i = 0; i < GRAPH_COUNT; i++)
     {
+        pChart->addGraph();
+        pChart->graph(i)->setPen(QPen(GRAPH_COLORS[i]));
+        pChart->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
         pChart->graph(i)->setVisible(false);
     }
-
 
     pChart->setInteraction(QCP::iRangeDrag, true);
     pChart->setInteraction(QCP::iRangeZoom, true);
@@ -252,8 +225,6 @@ void ChartWidget::setupChart(QCustomPlot *pChart)
     connect(pChart, &QCustomPlot::mouseWheel, this, &ChartWidget::plotMouseWheel);
     connect(pChart, &QCustomPlot::mouseDoubleClick, this, &ChartWidget::plotDoubleClicked);
     connect(pChart, &QCustomPlot::selectionChangedByUser, this, &ChartWidget::plotSelectionChanged);
-
-
     connect(pChart->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(plotChangeRangeAll(QCPRange)));
 }
 

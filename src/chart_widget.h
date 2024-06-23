@@ -17,12 +17,23 @@
 
 #pragma once
 
-#include <QElapsedTimer>
+#include <qelapsedtimer.h>
+#include <qcolor.h>
 #include "libs/qcustomplot/qcustomplot.h"
 
 class ChartWidget : public QCustomPlot
 {
     Q_OBJECT
+
+    const size_t GRAPH_COUNT = 5;
+    const QColor GRAPH_COLORS[5] =
+    {
+        QColorConstants::Red,
+        QColorConstants::Blue,
+        QColorConstants::Green,
+        QColorConstants::Yellow,
+        QColorConstants::Cyan
+    };
 public:
     ChartWidget(QCustomPlot *parent = 0);
     ~ChartWidget();
@@ -32,7 +43,6 @@ public:
     void appendData(qint64 time, uint16_t data0, uint16_t data1, uint16_t data2, uint16_t data3);
 
     void appendData(int voltage, int current, int ppm, int rpm, int position, int currentA, int currentB);
-
 
     void startChart(void);
     void updateChart(void);

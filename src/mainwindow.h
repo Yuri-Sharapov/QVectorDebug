@@ -23,6 +23,7 @@
 #include <QStyleFactory>
 #include <QElapsedTimer>
 
+#include "platform.h"
 #include "chart_widget.h"
 #include "port.h"
 
