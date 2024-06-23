@@ -52,7 +52,7 @@ const unsigned char Crc8Table[256] = {
     0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
 };
 
-static unsigned char crc8(unsigned char *pcBlock, unsigned char len)
+static unsigned char crc8(const unsigned char *pcBlock, unsigned char len)
 {
     unsigned char crc = 0xFF;
 
@@ -97,7 +97,7 @@ bool Port::openPort(long _baudrate, QString _name)
         connect(&m_port, &QSerialPort::readyRead, this, &Port::portReadyRead);
 
         m_timerNs.start();
-        m_timerNs_1 = 0;
+        m_guiLastUpdateTimeNs = 0;
         m_rxRawData.clear();
         m_port.clear();
         m_errorsCnt = 0;
@@ -151,7 +151,7 @@ void Port::protocolParseData(const QByteArray &data)
             }
             break;
         case PROTOCOL_DATA:
-            if (static_cast<size_t>(m_rxData.count()) < sizeof(ProtocolData) - 1)
+            if (static_cast<size_t>(m_rxData.count()) < sizeof(VectorProtocolData) - 1)
             {
                 m_rxData.push_back(_c);
             }
@@ -165,7 +165,7 @@ void Port::protocolParseData(const QByteArray &data)
                 if (_crc == _c)
                 {
                     m_rxData.push_back(_c);
-                    const ProtocolData* _pData = reinterpret_cast<ProtocolData*>(m_rxData.data());
+                    const VectorProtocolData* _pData = reinterpret_cast<VectorProtocolData*>(m_rxData.data());
 
                     ChartVar _chartVar;
                     _chartVar.data[0] = _pData->data[0];
@@ -177,10 +177,10 @@ void Port::protocolParseData(const QByteArray &data)
 
                     m_rxRawData.push_back(_chartVar);
                     // update gui if it need
-                    if (_chartVar.timeNs - m_timerNs_1 > 1000000 * GUI_UPDATE_PERIOD_MS)
+                    if (_chartVar.timeNs - m_guiLastUpdateTimeNs > 1000000 * GUI_UPDATE_PERIOD_MS)
                     {
 
-                        m_timerNs_1 = _chartVar.timeNs;
+                        m_guiLastUpdateTimeNs = _chartVar.timeNs;
                         emit updatePlot(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
                     }
                 }
@@ -200,133 +200,33 @@ void Port::protocolParseData(const QByteArray &data)
 
 void Port::protocolParseFEsc(const QByteArray &data)
 {
-    enum protocolState_e
+    m_rxData.append(data);
+    
+    while (m_rxData.size() >= sizeof(EscProtocolData))
     {
-        PROTOCOL_START,
-        PROTOCOL_TYPE,
-        PROTOCOL_DATA
-    };
-
-    static protocolState_e _state = PROTOCOL_START;
-    static bool _isExt = false;
-
-    for (int i = 0; i < data.count(); i++)
-    {
-        uint8_t _c = static_cast<uint8_t>(data.constData()[i]);
-        switch(_state)
+        uint8_t crcCompute = crc8(reinterpret_cast<const unsigned char*>(data.data()), data.size());
+        if (crcCompute == reinterpret_cast<const EscProtocolData*>(data.data())->consumption)
         {
-        case PROTOCOL_START:
-            if (_c == PROTOCOL_START_BYTE)
+            ChartVar newVar;
+            newVar.timeNs = m_timerNs.nsecsElapsed();
+
+            newVar.data[0] = m_rxData.at(0);                            // temperature
+            newVar.data[1] = (m_rxData.at(1) | m_rxData.at(2) << 8);    // voltage
+            newVar.data[2] = (m_rxData.at(3) | m_rxData.at(4) << 8);    // current
+            newVar.data[3] = (m_rxData.at(5) | m_rxData.at(6) << 8);    // consumption
+            newVar.data[4] = (m_rxData.at(7) | m_rxData.at(8) << 8);    // rpm
+            
+            m_rxRawData.push_back(newVar);
+            // update gui if it need
+            if (newVar.timeNs - m_guiLastUpdateTimeNs > 1000000 * GUI_UPDATE_PERIOD_MS)
             {
-                _state = PROTOCOL_TYPE;
-                m_rxData.clear();
-                m_rxData.push_back(_c);
+                m_guiLastUpdateTimeNs = newVar.timeNs;
+                emit updatePlot(newVar.timeNs, newVar.data[0], newVar.data[1], newVar.data[2], newVar.data[3]);
             }
-            break;
-        case PROTOCOL_TYPE:
-            if (_c == TELEMETRY_STD)
-            {
-                _isExt = false;
-                _state = PROTOCOL_DATA;
-                m_rxData.push_back(_c);
-            }
-            else if (_c == TELEMETRY_EXT)
-            {
-                _isExt = true;
-                _state = PROTOCOL_DATA;
-                m_rxData.push_back(_c);
-            }
-            else
-            {
-                _state = PROTOCOL_START;
-            }
-            break;
-        case PROTOCOL_DATA:
-            if (_isExt)
-            {
-                if (static_cast<size_t>(m_rxData.count()) < sizeof(TlExt_t) - 1)
-                {
-                    m_rxData.push_back(_c);
-                }
-                else
-                {
-                    uint8_t _crc = crc8((uint8_t*)m_rxData.data(), sizeof(TlExt_t) - 1);
-
-                    if (_crc == _c)
-                    {
-                        m_rxData.push_back(_c);
-                        const TlExt_t* _pData = reinterpret_cast<TlExt_t*>(m_rxData.data());
-
-                        ChartVar _chartVar;
-                        _chartVar.data[0] = _pData->inputVoltage;
-                        _chartVar.data[1] = _pData->inputCurrent;
-                        _chartVar.data[2] = _pData->ppm;
-                        _chartVar.data[3] = _pData->rpm;
-                        _chartVar.data[4] = _pData->position;
-                        _chartVar.data[5] = _pData->currentA;
-                        _chartVar.data[6] = _pData->currentB;
-
-                        _chartVar.timeNs = m_timerNs.nsecsElapsed();
-
-                        m_rxRawData.push_back(_chartVar);
-                        // update gui if it need
-                        if (_chartVar.timeNs - m_timerNs_1 > 1000000 * GUI_UPDATE_PERIOD_MS)
-                        {
-
-                            m_timerNs_1 = _chartVar.timeNs;
-                            emit updatePlot(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
-                        }
-                    }
-                    else
-                    {
-                        m_errorsCnt++;
-                    }
-                    _state = PROTOCOL_START;
-                }
-            }
-            else
-            {
-                if (static_cast<size_t>(m_rxData.count()) < sizeof(TlStd_t) - 1)
-                {
-                    m_rxData.append(_c);
-                }
-                else
-                {
-                    uint8_t _crc = crc8((uint8_t*)m_rxData.data(), sizeof(TlStd_t) - 1);
-
-                    if (_crc == _c)
-                    {
-                        m_rxData.push_back(_c);
-                        const TlStd_t* _pData = reinterpret_cast<TlStd_t*>(m_rxData.data());
-
-                        ChartVar _chartVar;
-                        _chartVar.data[0] = _pData->inputVoltage;
-                        _chartVar.data[1] = _pData->inputCurrent;
-                        _chartVar.data[2] = _pData->ppm;
-                        _chartVar.data[3] = _pData->rpm;
-
-                        _chartVar.timeNs = m_timerNs.nsecsElapsed();
-
-                        m_rxRawData.push_back(_chartVar);
-                        // update gui if it need
-                        if (_chartVar.timeNs - m_timerNs_1 > 1000000 * GUI_UPDATE_PERIOD_MS)
-                        {
-
-                            m_timerNs_1 = _chartVar.timeNs;
-                            emit updatePlot(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
-                        }
-                    }
-                    else
-                    {
-                        m_errorsCnt++;
-                    }
-                    _state = PROTOCOL_START;
-                }
-            }
-            break;
-        default:
-            _state = PROTOCOL_START;
-            break;
         }
-    }
+        else
+        {
+            m_rxData.remove(0, 1);
+        }
+    }    
 }

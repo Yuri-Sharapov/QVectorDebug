@@ -63,32 +63,14 @@ private slots:
     void on_actionBlack_toggled(bool arg1);
     void on_actionWhite_toggled(bool arg1);
 
-
     void on_actionUartVector_toggled(bool arg1);
-
     void on_actionFEsc_toggled(bool arg1);
 
-
-
-    void on_cbEscTemp_stateChanged(int arg1);
-
+    void on_cbEscTemperature_stateChanged(int arg1);
     void on_cbEscVoltage_stateChanged(int arg1);
-
     void on_cbEscCurrent_stateChanged(int arg1);
-
     void on_cbEscPower_stateChanged(int arg1);
-
-    void on_cbEscPpm_stateChanged(int arg1);
-
     void on_cbEscRpm_stateChanged(int arg1);
-
-    void on_cbEscPos_stateChanged(int arg1);
-
-    void on_cbEscCA_stateChanged(int arg1);
-
-    void on_cbEscCB_stateChanged(int arg1);
-
-    void on_cbEscCC_stateChanged(int arg1);
 
 private:
     void showStatusMessage(const QString &message);
@@ -98,8 +80,6 @@ private:
     void serialDisconnect(void);
 
     void openChart(QVector<Port::ChartVar>* pVars);
-
-    void updateWaveGenerator(void);
 
     void restoreSettings(void);
     void saveSettings(void);

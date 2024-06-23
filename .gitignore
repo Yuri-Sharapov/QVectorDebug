@@ -1,1 +1,10 @@
 *.user
+.vs
+debug
+release
+settings.ini
+ui_mainwindow.h
+QVectorDebug.qtvscr
+QVectorDebug.vcxproj.filters
+QVectorDebug_resource.aps
+QVectorDebug_resource.rc

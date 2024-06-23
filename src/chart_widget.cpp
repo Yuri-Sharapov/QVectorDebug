@@ -62,7 +62,7 @@ void ChartWidget::appendData(int voltage, int current, int ppm, int rpm, int pos
 {
     this->graph(0)->addData(m_timeStep, voltage);
     this->graph(1)->addData(m_timeStep, current);
-    this->graph(2)->addData(m_timeStep, current * voltage / 10);
+    this->graph(2)->addData(m_timeStep, current * voltage / 1000);
     this->graph(3)->addData(m_timeStep, ppm);
     this->graph(4)->addData(m_timeStep, rpm);
     this->graph(5)->addData(m_timeStep, position);

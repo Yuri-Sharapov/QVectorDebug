@@ -1,4 +1,4 @@
-#include "app/mainwindow.h"
+#include "mainwindow.h"
 #include <QApplication>
 #include <QStyleFactory>
 
@@ -7,9 +7,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     w.setWindowTitle("QVectorDebug");
-
-
-
     w.show();
     return a.exec();
 }

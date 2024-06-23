@@ -35,16 +35,12 @@ MainWindow::MainWindow(QWidget *parent)
     m_pUi->cbEnabled_3->setChecked(false);
     m_pUi->cbEnabled_4->setChecked(false);
 
-    m_pUi->cbEscTemp->setChecked(false);
+    m_pUi->cbEscTemperature->setChecked(false);
     m_pUi->cbEscVoltage->setChecked(false);
     m_pUi->cbEscCurrent->setChecked(false);
     m_pUi->cbEscPower->setChecked(false);
-    m_pUi->cbEscPpm->setChecked(false);
     m_pUi->cbEscRpm->setChecked(false);
-    m_pUi->cbEscPos->setChecked(false);
-    m_pUi->cbEscCA->setChecked(false);
-    m_pUi->cbEscCB->setChecked(false);
-    m_pUi->cbEscCC->setChecked(false);
+
 
     // create tight thread
     QThread *threadNew = new QThread;
@@ -299,8 +295,7 @@ void MainWindow::serialConnect()
         baudrate = m_pUi->cbBaudrate->itemData(m_pUi->cbBaudrate->currentIndex()).toInt();
     }
 
-    if (m_pPort->openPort(baudrate,
-                        m_pUi->cbPort->currentText()))
+    if (m_pPort->openPort(baudrate, m_pUi->cbPort->currentText()))
     {
         showStatusMessage(tr("Connected to %1: %2").arg(m_pUi->cbPort->currentText())
                                                    .arg(m_pUi->cbBaudrate->currentText()));
@@ -496,46 +491,34 @@ void MainWindow::on_actionFEsc_toggled(bool arg1)
 {
     if (arg1)
     {
-        m_protocol = Port::TYPE_FESC;
+        m_protocol = Port::TYPE_TESC;
         m_pUi->actionFEsc->setChecked(arg1);
         m_pUi->actionUartVector->setChecked(!arg1);
-        m_pPort->setProtocolType((Port::TYPE_FESC));
+        m_pPort->setProtocolType((Port::TYPE_TESC));
     }
 }
 
 
-
-
-
-void MainWindow::on_cbEscTemp_stateChanged(int arg1)
+void MainWindow::on_cbEscTemperature_stateChanged(int arg1)
 {
     m_pChart->changeVisablilty(Port::TEMPERATURE, (bool)arg1);
-}
 
+}
 
 void MainWindow::on_cbEscVoltage_stateChanged(int arg1)
 {
     m_pChart->changeVisablilty(Port::VOLTAGE, (bool)arg1);
 }
 
-
 void MainWindow::on_cbEscCurrent_stateChanged(int arg1)
 {
     m_pChart->changeVisablilty(Port::CURRENT, (bool)arg1);
 }
 
-
 void MainWindow::on_cbEscPower_stateChanged(int arg1)
 {
-    m_pChart->changeVisablilty(Port::POWER, (bool)arg1);
+    m_pChart->changeVisablilty(Port::CONSUMPTION, (bool)arg1);
 }
-
-
-void MainWindow::on_cbEscPpm_stateChanged(int arg1)
-{
-    m_pChart->changeVisablilty(Port::PPM, (bool)arg1);
-}
-
 
 void MainWindow::on_cbEscRpm_stateChanged(int arg1)
 {
@@ -543,26 +526,5 @@ void MainWindow::on_cbEscRpm_stateChanged(int arg1)
 }
 
 
-void MainWindow::on_cbEscPos_stateChanged(int arg1)
-{
-    m_pChart->changeVisablilty(Port::POS, (bool)arg1);
-}
 
-
-void MainWindow::on_cbEscCA_stateChanged(int arg1)
-{
-    m_pChart->changeVisablilty(Port::CA, (bool)arg1);
-}
-
-
-void MainWindow::on_cbEscCB_stateChanged(int arg1)
-{
-    m_pChart->changeVisablilty(Port::CB, (bool)arg1);
-}
-
-
-void MainWindow::on_cbEscCC_stateChanged(int arg1)
-{
-    m_pChart->changeVisablilty(Port::CC, (bool)arg1);
-}
 

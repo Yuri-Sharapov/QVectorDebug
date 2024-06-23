@@ -122,7 +122,7 @@
            <item>
             <widget class="QTabWidget" name="tabWidget">
              <property name="currentIndex">
-              <number>0</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="tab">
               <attribute name="title">
@@ -379,13 +379,6 @@
               </attribute>
               <layout class="QVBoxLayout" name="verticalLayout_5">
                <item>
-                <widget class="Line" name="line_3">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QLabel" name="label">
                  <property name="maximumSize">
                   <size>
@@ -399,23 +392,16 @@
                 </widget>
                </item>
                <item>
-                <widget class="Line" name="line_4">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout">
+                <layout class="QHBoxLayout" name="horizontalLayout_6">
                  <item>
-                  <widget class="QCheckBox" name="cbEscTemp">
+                  <widget class="QCheckBox" name="cbEscTemperature">
                    <property name="text">
                     <string>Temperature</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QFrame" name="frame">
+                  <widget class="QFrame" name="frame_5">
                    <property name="minimumSize">
                     <size>
                      <width>30</width>
@@ -509,45 +495,12 @@
                  <item>
                   <widget class="QCheckBox" name="cbEscPower">
                    <property name="text">
-                    <string>Consumption (Calculated)</string>
+                    <string>Consumption</string>
                    </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QFrame" name="frame_4">
-                   <property name="minimumSize">
-                    <size>
-                     <width>30</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>30</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="frameShape">
-                    <enum>QFrame::StyledPanel</enum>
-                   </property>
-                   <property name="frameShadow">
-                    <enum>QFrame::Raised</enum>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_6">
-                 <item>
-                  <widget class="QCheckBox" name="cbEscPpm">
-                   <property name="text">
-                    <string>PPM</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QFrame" name="frame_5">
                    <property name="minimumSize">
                     <size>
                      <width>30</width>
@@ -581,165 +534,6 @@
                  </item>
                  <item>
                   <widget class="QFrame" name="frame_6">
-                   <property name="minimumSize">
-                    <size>
-                     <width>30</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>30</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="frameShape">
-                    <enum>QFrame::StyledPanel</enum>
-                   </property>
-                   <property name="frameShadow">
-                    <enum>QFrame::Raised</enum>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <widget class="Line" name="line">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_2">
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Extended</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="Line" name="line_2">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_8">
-                 <item>
-                  <widget class="QCheckBox" name="cbEscPos">
-                   <property name="text">
-                    <string>Position</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QFrame" name="frame_7">
-                   <property name="minimumSize">
-                    <size>
-                     <width>30</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>30</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="frameShape">
-                    <enum>QFrame::StyledPanel</enum>
-                   </property>
-                   <property name="frameShadow">
-                    <enum>QFrame::Raised</enum>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_9">
-                 <item>
-                  <widget class="QCheckBox" name="cbEscCA">
-                   <property name="text">
-                    <string>CurrentA</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QFrame" name="frame_8">
-                   <property name="minimumSize">
-                    <size>
-                     <width>30</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>30</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="frameShape">
-                    <enum>QFrame::StyledPanel</enum>
-                   </property>
-                   <property name="frameShadow">
-                    <enum>QFrame::Raised</enum>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_10">
-                 <item>
-                  <widget class="QCheckBox" name="cbEscCB">
-                   <property name="text">
-                    <string>CurrentB</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QFrame" name="frame_9">
-                   <property name="minimumSize">
-                    <size>
-                     <width>30</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>30</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="frameShape">
-                    <enum>QFrame::StyledPanel</enum>
-                   </property>
-                   <property name="frameShadow">
-                    <enum>QFrame::Raised</enum>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_11">
-                 <item>
-                  <widget class="QCheckBox" name="cbEscCC">
-                   <property name="text">
-                    <string>CurrentC (Calculated)</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QFrame" name="frame_10">
                    <property name="minimumSize">
                     <size>
                      <width>30</width>
@@ -797,7 +591,7 @@
      <x>0</x>
      <y>0</y>
      <width>1008</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -823,17 +617,32 @@
      <addaction name="actionUartVector"/>
      <addaction name="actionFEsc"/>
     </widget>
-    <widget class="QMenu" name="menuTheme">
+    <widget class="QMenu" name="menuTime_Axis">
+     <property name="title">
+      <string>Time Axis</string>
+     </property>
+     <addaction name="actioncounter"/>
+     <addaction name="actionAbsolute"/>
+    </widget>
+    <addaction name="menuProtocol"/>
+    <addaction name="menuTime_Axis"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="menuTheme_2">
      <property name="title">
       <string>Theme</string>
      </property>
+     <addaction name="separator"/>
      <addaction name="actionWhite"/>
      <addaction name="actionBlack"/>
     </widget>
-    <addaction name="menuProtocol"/>
-    <addaction name="menuTheme"/>
+    <addaction name="menuTheme_2"/>
    </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuView"/>
    <addaction name="menuOptions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -860,11 +669,14 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>UART Vector</string>
+    <string>Vector</string>
    </property>
   </action>
   <action name="actionWhite">
    <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
     <bool>true</bool>
    </property>
    <property name="text">
@@ -885,6 +697,30 @@
    </property>
    <property name="text">
     <string>FEsc</string>
+   </property>
+  </action>
+  <action name="actioncounter">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Relative</string>
+   </property>
+  </action>
+  <action name="actionAbsolute">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Absolute</string>
+   </property>
+  </action>
+  <action name="actiona">
+   <property name="text">
+    <string>a</string>
    </property>
   </action>
  </widget>

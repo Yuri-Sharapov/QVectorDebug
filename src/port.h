@@ -25,59 +25,36 @@
 #define PROTOCOL_START_BYTE     0x55
 #define GUI_UPDATE_PERIOD_MS    100
 
-#define TELEMETRY_STD     0x0A
-#define TELEMETRY_EXT     0x0B
-
 class Port : public QObject
 {
     Q_OBJECT
 
 #pragma pack(push, 1)
-    struct ProtocolData
+    struct VectorProtocolData
     {
         int16_t    data[4];
         uint8_t    checkSum;
     };
 
-    typedef struct TlStd
+    struct EscProtocolData
     {
-        uint8_t     start;
-        uint8_t     type;
-        uint16_t    inputVoltage;
-        uint16_t    inputCurrent;
-        uint16_t    ppm;
-        uint16_t    rpm;
+        int8_t      temperature;    // in Celsius
+        uint16_t    voltage;        // V / 100
+        uint16_t    current;        // A / 1000;
+        uint16_t    consumption;    // in 1mAh
+        uint16_t    rpm;            // electrical RPM/100
         uint8_t     crc;
-    } TlStd_t;
-
-    typedef struct TlExt
-    {
-        uint8_t     start;
-        uint8_t     type;
-        uint16_t    inputVoltage;
-        uint16_t    inputCurrent;
-        uint16_t    ppm;
-        uint16_t    rpm;
-        uint16_t    position;
-        int16_t     currentA;
-        int16_t     currentB;
-        uint8_t     crc;
-    } TlExt_t;
+    };
 #pragma pack( pop )
 
 public:
-    enum EscGraphs
+    enum EscProtocolGraphs
     {
         TEMPERATURE,
         VOLTAGE,
         CURRENT,
-        POWER,
-        PPM,
-        RPM,
-        POS,
-        CA,
-        CB,
-        CC
+        CONSUMPTION,
+        RPM
     };
 
     struct ChartVar
@@ -89,7 +66,7 @@ public:
     enum ProcotolType
     {
         TYPE_VECTOR = 0,
-        TYPE_FESC = 1
+        TYPE_TESC = 1
     };
 
     enum RxState
@@ -114,11 +91,6 @@ public:
     QVector<ChartVar>* getChartVars(void)
     {
         return &m_rxRawData;
-    }
-
-    QVector<ChartVar>* getChartExtVars(void)
-    {
-        return &m_rxRawExtData;
     }
 
     int getErrorsCnt(void)
@@ -160,9 +132,8 @@ private:
 
     QByteArray          m_rxData;
     QVector<ChartVar>   m_rxRawData;
-    QVector<ChartVar>   m_rxRawExtData;
     QElapsedTimer       m_timerNs;
-    uint64_t            m_timerNs_1;
+    uint64_t            m_guiLastUpdateTimeNs;
     uint32_t            m_errorsCnt = 0;
     ProcotolType        m_currentProtocolType;
 };
