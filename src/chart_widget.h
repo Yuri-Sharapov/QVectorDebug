@@ -34,15 +34,34 @@ class ChartWidget : public QCustomPlot
         QColorConstants::Yellow,
         QColorConstants::Cyan
     };
+
+    const char* GRAPH_NAMES[5] =
+    {
+        "Temperature",
+        "Voltage",
+        "Current",
+        "Consumption",
+        "RPM"
+    };
+
+    enum GraphNames
+    {
+        TEMPERATURE = 0,
+        VOLTAGE = 1,
+        CURRENT = 2,
+        CONSUMPTION = 3,
+        RPM = 4
+    };
+
 public:
     ChartWidget(QCustomPlot *parent = 0);
     ~ChartWidget();
 
-    void appendData(qint64 time, int16_t data0, int16_t data1, int16_t data2, int16_t data3);
-    void appendData(int16_t data0, int16_t data1, int16_t data2, int16_t data3);
-    void appendData(qint64 time, uint16_t data0, uint16_t data1, uint16_t data2, uint16_t data3);
+    void addVectorData(qint64 time, int data0, int data1, int data2, int data3);
+    void addVectorDataRelative(int data0, int data1, int data2, int data3);
 
-    void appendData(int voltage, int current, int ppm, int rpm, int position, int currentA, int currentB);
+    void addEscData(qint64 time, int temp, int voltage, int current, int consumption, int rpm);
+    void addEscDataRelative(int temp, int voltage, int current, int consumption, int rpm);
 
     void startChart(void);
     void updateChart(void);

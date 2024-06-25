@@ -22,112 +22,99 @@ ChartWidget::ChartWidget(QCustomPlot *parent)
     : QCustomPlot(parent)
 {
     setupChart(this);
-
-    this->rescaleAxes();
-    this->replot();
+    rescaleAxes();
+    replot();
 }
 
 ChartWidget::~ChartWidget()
 {
 }
 
-void ChartWidget::appendData(qint64 time, int16_t data0, int16_t data1, int16_t data2, int16_t data3)
+void ChartWidget::addVectorData(qint64 time, int data0, int data1, int data2, int data3)
 {
-    this->graph(0)->addData(time/1000000U, data0);
-    this->graph(1)->addData(time/1000000U, data1);
-    this->graph(2)->addData(time/1000000U, data2);
-    this->graph(3)->addData(time/1000000U, data3);
+    graph(0)->addData(static_cast<double>(time)/1000000.0, static_cast<double>(data0));
+    graph(1)->addData(static_cast<double>(time)/1000000.0, static_cast<double>(data1));
+    graph(2)->addData(static_cast<double>(time)/1000000.0, static_cast<double>(data2));
+    graph(3)->addData(static_cast<double>(time)/1000000.0, static_cast<double>(data3));
 }
 
-void ChartWidget::appendData(int16_t data0, int16_t data1, int16_t data2, int16_t data3)
+void ChartWidget::addVectorDataRelative(int data0, int data1, int data2, int data3)
 {
-
-    this->graph(0)->addData(m_timeStep, data0);
-    this->graph(1)->addData(m_timeStep, data1);
-    this->graph(2)->addData(m_timeStep, data2);
-    this->graph(3)->addData(m_timeStep, data3);
+    graph(0)->addData(m_timeStep, static_cast<double>(data0));
+    graph(1)->addData(m_timeStep, static_cast<double>(data1));
+    graph(2)->addData(m_timeStep, static_cast<double>(data2));
+    graph(3)->addData(m_timeStep, static_cast<double>(data3));
     m_timeStep++;
 }
 
-void ChartWidget::appendData(qint64 time, uint16_t data0, uint16_t data1, uint16_t data2, uint16_t data3)
+void ChartWidget::addEscData(qint64 time, int temp, int voltage, int current, int consumption, int rpm)
 {
-
-    this->graph(0)->addData(time/1000000U, data0);
-    this->graph(1)->addData(time/1000000U, data1);
-    this->graph(2)->addData(time/1000000U, data2);
-    this->graph(3)->addData(time/1000000U, data3);
+    graph(0)->addData(static_cast<double>(time) / 1000000.0, static_cast<double>(temp));
+    graph(1)->addData(static_cast<double>(time) / 1000000.0, static_cast<double>(voltage));
+    graph(2)->addData(static_cast<double>(time) / 1000000.0, static_cast<double>(current));
+    graph(3)->addData(static_cast<double>(time) / 1000000.0, static_cast<double>(consumption));
+    graph(4)->addData(static_cast<double>(time) / 1000000.0, static_cast<double>(rpm));
 }
 
-void ChartWidget::appendData(int voltage, int current, int ppm, int rpm, int position, int currentA, int currentB)
+void ChartWidget::addEscDataRelative(int temp, int voltage, int current, int consumption, int rpm)
 {
-    this->graph(0)->addData(m_timeStep, voltage);
-    this->graph(1)->addData(m_timeStep, current);
-    this->graph(2)->addData(m_timeStep, current * voltage / 1000);
-    this->graph(3)->addData(m_timeStep, ppm);
-    this->graph(4)->addData(m_timeStep, rpm);
-    this->graph(5)->addData(m_timeStep, position);
-    this->graph(6)->addData(m_timeStep, currentA);
-    this->graph(7)->addData(m_timeStep, currentB);
-    this->graph(8)->addData(m_timeStep, -currentA - currentB);
+    graph(TEMPERATURE)->addData(m_timeStep, static_cast<double>(temp));
+    graph(VOLTAGE)->addData(m_timeStep, static_cast<double>(voltage));
+    graph(CURRENT)->addData(m_timeStep, static_cast<double>(current));
+    graph(CONSUMPTION)->addData(m_timeStep, static_cast<double>(consumption));
+    graph(RPM)->addData(m_timeStep, static_cast<double>(rpm));
     m_timeStep++;
 }
-
 
 void ChartWidget::startChart()
 {
-    this->graph(0)->data()->clear();
-    this->graph(1)->data()->clear();
-    this->graph(2)->data()->clear();
-    this->graph(3)->data()->clear();
-    this->graph(4)->data()->clear();
-    this->graph(5)->data()->clear();
-    this->graph(6)->data()->clear();
-    this->graph(7)->data()->clear();
-    this->graph(8)->data()->clear();
+    for (int i = 0; i < GRAPH_COUNT; i++)
+        graph(i)->data()->clear();
+ 
     m_timeStep = 0;
 }
 
 void ChartWidget::updateChart()
 {
-    this->rescaleAxes();
-    this->replot();
+    rescaleAxes();
+    replot();
 }
 
 void ChartWidget::setThemeBackground(const QColor &brush)
 {
     if (brush == Qt::white)
     {
-        this->setBackground(QBrush(QColor(242,242,242)));
+        setBackground(QBrush(QColor(242,242,242)));
 
-        this->xAxis->setTickLabelColor(Qt::black);
-        this->xAxis->setBasePen(QPen(Qt::black));
-        this->xAxis->setLabelColor(Qt::black);
-        this->xAxis->setTickPen(QPen(Qt::black));
-        this->xAxis->setSubTickPen(QPen(Qt::black));
+        xAxis->setTickLabelColor(Qt::black);
+        xAxis->setBasePen(QPen(Qt::black));
+        xAxis->setLabelColor(Qt::black);
+        xAxis->setTickPen(QPen(Qt::black));
+        xAxis->setSubTickPen(QPen(Qt::black));
 
-        this->yAxis->setTickLabelColor(Qt::black);
-        this->yAxis->setBasePen(QPen(Qt::black));
-        this->yAxis->setLabelColor(Qt::black);
-        this->yAxis->setTickPen(QPen(Qt::black));
-        this->yAxis->setSubTickPen(QPen(Qt::black));
+        yAxis->setTickLabelColor(Qt::black);
+        yAxis->setBasePen(QPen(Qt::black));
+        yAxis->setLabelColor(Qt::black);
+        yAxis->setTickPen(QPen(Qt::black));
+        yAxis->setSubTickPen(QPen(Qt::black));
 
         m_cursorColor = QPen(Qt::black);
     }
     else
     {
-        this->setBackground(QBrush(QColor(42,42,42)));
+        setBackground(QBrush(QColor(42,42,42)));
 
-        this->xAxis->setTickLabelColor(Qt::white);
-        this->xAxis->setBasePen(QPen(Qt::white));
-        this->xAxis->setLabelColor(Qt::white);
-        this->xAxis->setTickPen(QPen(Qt::white));
-        this->xAxis->setSubTickPen(QPen(Qt::white));
+        xAxis->setTickLabelColor(Qt::white);
+        xAxis->setBasePen(QPen(Qt::white));
+        xAxis->setLabelColor(Qt::white);
+        xAxis->setTickPen(QPen(Qt::white));
+        xAxis->setSubTickPen(QPen(Qt::white));
 
-        this->yAxis->setTickLabelColor(Qt::white);
-        this->yAxis->setBasePen(QPen(Qt::white));
-        this->yAxis->setLabelColor(Qt::white);
-        this->yAxis->setTickPen(QPen(Qt::white));
-        this->yAxis->setSubTickPen(QPen(Qt::white));
+        yAxis->setTickLabelColor(Qt::white);
+        yAxis->setBasePen(QPen(Qt::white));
+        yAxis->setLabelColor(Qt::white);
+        yAxis->setTickPen(QPen(Qt::white));
+        yAxis->setSubTickPen(QPen(Qt::white));
 
         m_cursorColor = QPen(Qt::yellow);
     }

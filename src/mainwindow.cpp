@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_pUi->cbEscPower->setChecked(false);
     m_pUi->cbEscRpm->setChecked(false);
 
+    m_pUi->gbCursor1->setVisible(false);
+    m_pUi->gbCursor2->setVisible(false);
 
     // create tight thread
     QThread *threadNew = new QThread;
@@ -107,7 +109,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4)
 {
     Q_UNUSED(timeNs);
-    m_pChart->appendData(var1, var2, var3, var4);
+    m_pChart->addVectorDataRelative(var1, var2, var3, var4);
     m_pChart->updateChart();
 }
 
@@ -334,10 +336,10 @@ void MainWindow::openChart(QVector<Port::ChartVar> *pVars)
         //    timePrevNs = var.timeNs;
         //}
         if (m_protocol == Port::TYPE_VECTOR)
-            m_pChart->appendData(var.data[0], var.data[1], var.data[2], var.data[3]);
+            m_pChart->addVectorDataRelative(var.data[0], var.data[1], var.data[2], var.data[3]);
         else
         {
-            m_pChart->appendData(var.data[0], var.data[1], var.data[2], var.data[3], var.data[4], var.data[5], var.data[6]);
+            m_pChart->addEscDataRelative(var.data[0], var.data[1], var.data[2], var.data[3], var.data[4]);
         }
     }
 
@@ -501,6 +503,61 @@ void MainWindow::on_actionFEsc_toggled(bool arg1)
     }
 }
 
+void MainWindow::on_actionC1_toggled(bool arg1)
+{
+    m_pUi->gbCursor1->setVisible(arg1);
+    m_pChart->enableCursor(arg1);
+    m_pUi->cbCursor1->setCurrentIndex(0);
+}
+
+void MainWindow::on_actionC2_toggled(bool arg1)
+{
+    m_pUi->gbCursor2->setVisible(arg1);
+}
+
+void MainWindow::on_cbCursor1_currentIndexChanged(int arg1)
+{
+    if (arg1 == 0)
+    {
+        // X axis change
+        qDebug() << "Cursor 1: X axis change";
+        m_pUi->sbCursorX1->setEnabled(true);
+        m_pUi->sbCursorY1->setEnabled(false);
+    }
+    else if (arg1 == 1)
+    {
+        // Y axis change
+        qDebug() << "Cursor 1: Y axis change";
+        m_pUi->sbCursorX1->setEnabled(false);
+        m_pUi->sbCursorY1->setEnabled(true);
+    }
+    else
+    {
+        // XY axis change
+        qDebug() << "Cursor 1: XY axis change";
+        m_pUi->sbCursorX1->setEnabled(true);
+        m_pUi->sbCursorY1->setEnabled(true);
+    }
+}
+
+void MainWindow::on_cbCursor2_currentIndexChanged(int arg1)
+{
+    if (arg1 == 0)
+    {
+        // X axis change
+        qDebug() << "Cursor 1: X axis change";
+    }
+    else if (arg1 == 1)
+    {
+        // Y axis change
+        qDebug() << "Cursor 1: Y axis change";
+    }
+    else
+    {
+        // XY axis change
+        qDebug() << "Cursor 1: XY axis change";
+    }
+}
 
 void MainWindow::on_cbEscTemperature_stateChanged(int arg1)
 {

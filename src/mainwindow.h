@@ -67,6 +67,12 @@ private slots:
     void on_actionUartVector_toggled(bool arg1);
     void on_actionFEsc_toggled(bool arg1);
 
+    void on_actionC1_toggled(bool arg1);
+    void on_actionC2_toggled(bool arg1);
+
+    void on_cbCursor1_currentIndexChanged(int arg1);
+    void on_cbCursor2_currentIndexChanged(int arg1);
+
     void on_cbEscTemperature_stateChanged(int arg1);
     void on_cbEscVoltage_stateChanged(int arg1);
     void on_cbEscCurrent_stateChanged(int arg1);
