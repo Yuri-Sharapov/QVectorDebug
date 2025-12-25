@@ -39,10 +39,10 @@ class Port : public QObject
     struct EscProtocolData
     {
         int8_t      temperature;    // in Celsius
-        uint16_t    voltage;        // V / 100
-        uint16_t    current;        // A / 1000;
-        uint16_t    consumption;    // in 1mAh
-        uint16_t    rpm;            // electrical RPM/100
+        int16_t     voltage;        // V / 100
+        int16_t     current;        // A / 1000;
+        int16_t     consumption;    // in 1mAh
+        int16_t     rpm;            // electrical RPM/100
         uint8_t     crc;
     };
 #pragma pack( pop )
@@ -65,8 +65,8 @@ public:
 
     enum ProcotolType
     {
-        TYPE_VECTOR = 0,
-        TYPE_TESC = 1
+        TYPE_V1 = 0,
+        TYPE_V2 = 1
     };
 
     enum RxState
@@ -109,7 +109,6 @@ public:
     }
 
 public slots:
-    void process();
     void write(const QByteArray &data);
 
 private slots:
@@ -117,7 +116,7 @@ private slots:
 
 signals:
     void finished();
-    void updatePlot(qint64 timeNs, short var1, short var2, short var3, short var4);
+    void updatePlot(qint64 timeNs, short var1, short var2, short var3, short var4, short var5);
 
 private:
     void protocolParseData(const QByteArray &data);

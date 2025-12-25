@@ -10,18 +10,20 @@ CONFIG += c++11
 
 SOURCES += \
     libs/qcustomplot/qcustomplot.cpp \
-    src/app/chart_widget.cpp \
-    src/app/mainwindow.cpp \
-    src/app/port.cpp \    
+    src/chart_widget.cpp \
+    src/color_circle_label.cpp \
+    src/mainwindow.cpp \
+    src/port.cpp \
     src/main.cpp
 
 INCLUDEPATH += $$PWD/src/
 
 HEADERS += \
     libs/qcustomplot/qcustomplot.h \
-    src/app/chart_widget.h \
-    src/app/mainwindow.h \
-    src/app/port.h \
+    src/chart_widget.h \
+    src/color_circle_label.h \
+    src/mainwindow.h \
+    src/port.h \
     src/platform.h \
 
 FORMS += \

@@ -24,15 +24,14 @@
 class ChartWidget : public QCustomPlot
 {
     Q_OBJECT
-
     const size_t GRAPH_COUNT = 5;
     const QColor GRAPH_COLORS[5] =
     {
-        QColorConstants::Red,
-        QColorConstants::Blue,
-        QColorConstants::Green,
-        QColorConstants::Yellow,
-        QColorConstants::Cyan
+        Qt::GlobalColor::red,
+        Qt::GlobalColor::blue,
+        Qt::GlobalColor::green,
+        Qt::GlobalColor::yellow,
+        Qt::GlobalColor::cyan
     };
 
     const char* GRAPH_NAMES[5] =

@@ -52,23 +52,10 @@ const unsigned char Crc8Table[256] = {
     0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
 };
 
-static unsigned char crc8(const unsigned char *pcBlock, unsigned char len)
-{
-    unsigned char crc = 0xFF;
-
-    while (len--)
-        crc = Crc8Table[crc ^ *pcBlock++];
-
-    return crc;
-}
-
 void Port::portReadyRead()
 {
     QByteArray array = m_port.readAll();
-    if (m_currentProtocolType == TYPE_VECTOR)
-        protocolParseData(array);
-    else
-        protocolParseFEsc(array);
+    protocolParseData(array);
 }
 
 Port::Port(QObject *parent) :
@@ -115,17 +102,10 @@ void Port::closePort(void)
     m_port.close();
 }
 
-void Port::process()
-{
-
-}
-
 void Port::write(const QByteArray &data)
 {
     if (m_port.isOpen())
-    {
         m_port.write(data);
-    }
 }
 
 void Port::protocolParseData(const QByteArray &data)
@@ -181,7 +161,7 @@ void Port::protocolParseData(const QByteArray &data)
                     {
 
                         m_guiLastUpdateTimeNs = _chartVar.timeNs;
-                        emit updatePlot(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3]);
+                        emit updatePlot(_chartVar.timeNs, _chartVar.data[0], _chartVar.data[1], _chartVar.data[2], _chartVar.data[3], _chartVar.data[4]);
                     }
                 }
                 else
@@ -196,37 +176,4 @@ void Port::protocolParseData(const QByteArray &data)
             break;
         }
     }
-}
-
-void Port::protocolParseFEsc(const QByteArray &data)
-{
-    m_rxData.append(data);
-    
-    while (m_rxData.size() >= sizeof(EscProtocolData))
-    {
-        uint8_t crcCompute = crc8(reinterpret_cast<const unsigned char*>(data.data()), data.size());
-        if (crcCompute == reinterpret_cast<const EscProtocolData*>(data.data())->consumption)
-        {
-            ChartVar newVar;
-            newVar.timeNs = m_timerNs.nsecsElapsed();
-
-            newVar.data[0] = m_rxData.at(0);                            // temperature
-            newVar.data[1] = (m_rxData.at(1) | m_rxData.at(2) << 8);    // voltage
-            newVar.data[2] = (m_rxData.at(3) | m_rxData.at(4) << 8);    // current
-            newVar.data[3] = (m_rxData.at(5) | m_rxData.at(6) << 8);    // consumption
-            newVar.data[4] = (m_rxData.at(7) | m_rxData.at(8) << 8);    // rpm
-            
-            m_rxRawData.push_back(newVar);
-            // update gui if it need
-            if (newVar.timeNs - m_guiLastUpdateTimeNs > 1000000 * GUI_UPDATE_PERIOD_MS)
-            {
-                m_guiLastUpdateTimeNs = newVar.timeNs;
-                emit updatePlot(newVar.timeNs, newVar.data[0], newVar.data[1], newVar.data[2], newVar.data[3]);
-            }
-        }
-        else
-        {
-            m_rxData.remove(0, 1);
-        }
-    }    
 }

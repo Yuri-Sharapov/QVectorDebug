@@ -34,15 +34,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_pUi->cbEnabled_3->setChecked(false);
     m_pUi->cbEnabled_4->setChecked(false);
 
-    m_pUi->cbEscTemperature->setChecked(false);
-    m_pUi->cbEscVoltage->setChecked(false);
-    m_pUi->cbEscCurrent->setChecked(false);
-    m_pUi->cbEscPower->setChecked(false);
-    m_pUi->cbEscRpm->setChecked(false);
-
-    m_pUi->gbCursor1->setVisible(false);
-    m_pUi->gbCursor2->setVisible(false);
-
     // create tight thread
     QThread *threadNew = new QThread;
     // move class to new thread
@@ -106,7 +97,7 @@ MainWindow::~MainWindow()
     delete m_pStatus;
 }
 
-void MainWindow::on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4)
+void MainWindow::on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4, short var5)
 {
     Q_UNUSED(timeNs);
     m_pChart->addVectorDataRelative(var1, var2, var3, var4);
@@ -321,7 +312,7 @@ void MainWindow::openChart(QVector<Port::ChartVar> *pVars)
     qint64 timePrevNs = 0;
 
 
-    for(Port::ChartVar var : *pVars)
+    for(int i = 0; i < pVars->size(); i++)
     {
         //if (timePrevNs == 0)
         //{
@@ -335,11 +326,11 @@ void MainWindow::openChart(QVector<Port::ChartVar> *pVars)
 //
         //    timePrevNs = var.timeNs;
         //}
-        if (m_protocol == Port::TYPE_VECTOR)
-            m_pChart->addVectorDataRelative(var.data[0], var.data[1], var.data[2], var.data[3]);
+        if (m_protocol == Port::TYPE_V1)
+            m_pChart->addVectorDataRelative(pVars->at(i).data[0], pVars->at(i).data[1], pVars->at(i).data[2], pVars->at(i).data[3]);
         else
         {
-            m_pChart->addEscDataRelative(var.data[0], var.data[1], var.data[2], var.data[3], var.data[4]);
+            m_pChart->addEscDataRelative(pVars->at(i).data[0], pVars->at(i).data[1], pVars->at(i).data[2], pVars->at(i).data[3], pVars->at(i).data[4]);
         }
     }
 
@@ -363,9 +354,6 @@ void MainWindow::restoreSettings()
         m_pSettings->setValue("wnd/maximized", 0);
     if (!m_pSettings->contains("wnd/left_panel"))
         m_pSettings->setValue("wnd/left_panel", m_pUi->splitter->saveState());
-    if (!m_pSettings->contains("wnd/left_panel_tab"))
-        m_pSettings->setValue("wnd/left_panel_tab", m_pUi->tabWidget->currentIndex());
-
     if (!m_pSettings->contains("wnd/theme"))
         m_pSettings->setValue("wnd/theme", static_cast<int>(m_uiTheme));
 
@@ -386,7 +374,6 @@ void MainWindow::restoreSettings()
     // left panel
     QByteArray splitterState = m_pSettings->value("wnd/left_panel").toByteArray();
     m_pUi->splitter->restoreState(splitterState);
-    m_pUi->tabWidget->setCurrentIndex(m_pSettings->value("wnd/left_panel_tab").toInt());
     
     // theme
     m_uiTheme = static_cast<ThemeSelector>(m_pSettings->value("wnd/theme").toInt());
@@ -394,15 +381,15 @@ void MainWindow::restoreSettings()
     // port type
     m_pPort->setProtocolType(static_cast<Port::ProcotolType>(m_pSettings->value("port/protocol").toInt()));
 
-    if (m_pPort->getProtocolType() == Port::ProcotolType::TYPE_VECTOR)
+    if (m_pPort->getProtocolType() == Port::ProcotolType::TYPE_V1)
     {
-        m_pUi->actionUartVector->setChecked(true);
-        m_pUi->actionFEsc->setChecked(false);
+        m_pUi->actionV1->setChecked(true);
+        m_pUi->actionV2->setChecked(false);
     }
     else
     {
-        m_pUi->actionUartVector->setChecked(false);
-        m_pUi->actionFEsc->setChecked(true);
+        m_pUi->actionV1->setChecked(false);
+        m_pUi->actionV2->setChecked(true);
     }
     // port name and baudrate
     m_pUi->cbBaudrate->setCurrentIndex(m_pSettings->value("port/baudrate").toInt());
@@ -424,8 +411,6 @@ void MainWindow::saveSettings()
 
     // left panel
     m_pSettings->setValue("wnd/left_panel", m_pUi->splitter->saveState());
-    m_pSettings->setValue("wnd/left_panel_tab", m_pUi->tabWidget->currentIndex());
-
     m_pSettings->setValue("wnd/theme", static_cast<int>(m_uiTheme));
     m_pSettings->setValue("port/protocol", static_cast<int>(m_pPort->getProtocolType()));
     m_pSettings->setValue("port/name", m_pUi->cbPort->currentIndex());
@@ -480,111 +465,27 @@ void MainWindow::on_actionWhite_toggled(bool arg1)
 }
 
 
-void MainWindow::on_actionUartVector_toggled(bool arg1)
+void MainWindow::on_actionV1_toggled(bool arg1)
 {
     if (arg1)
     {
-        m_protocol = Port::TYPE_VECTOR;
-        m_pUi->actionFEsc->setChecked(!arg1);
-        m_pUi->actionUartVector->setChecked(arg1);
-        m_pPort->setProtocolType((Port::TYPE_VECTOR));
+        m_protocol = Port::TYPE_V1;
+        m_pUi->actionV2->setChecked(!arg1);
+        m_pUi->actionV1->setChecked(arg1);
+        m_pPort->setProtocolType(m_protocol);
     }
 }
 
 
-void MainWindow::on_actionFEsc_toggled(bool arg1)
+void MainWindow::on_actionV2_toggled(bool arg1)
 {
     if (arg1)
     {
-        m_protocol = Port::TYPE_TESC;
-        m_pUi->actionFEsc->setChecked(arg1);
-        m_pUi->actionUartVector->setChecked(!arg1);
-        m_pPort->setProtocolType((Port::TYPE_TESC));
+        m_protocol = Port::TYPE_V2;
+        m_pUi->actionV2->setChecked(arg1);
+        m_pUi->actionV1->setChecked(!arg1);
+        m_pPort->setProtocolType(m_protocol);
     }
 }
-
-void MainWindow::on_actionC1_toggled(bool arg1)
-{
-    m_pUi->gbCursor1->setVisible(arg1);
-    m_pChart->enableCursor(arg1);
-    m_pUi->cbCursor1->setCurrentIndex(0);
-}
-
-void MainWindow::on_actionC2_toggled(bool arg1)
-{
-    m_pUi->gbCursor2->setVisible(arg1);
-}
-
-void MainWindow::on_cbCursor1_currentIndexChanged(int arg1)
-{
-    if (arg1 == 0)
-    {
-        // X axis change
-        qDebug() << "Cursor 1: X axis change";
-        m_pUi->sbCursorX1->setEnabled(true);
-        m_pUi->sbCursorY1->setEnabled(false);
-    }
-    else if (arg1 == 1)
-    {
-        // Y axis change
-        qDebug() << "Cursor 1: Y axis change";
-        m_pUi->sbCursorX1->setEnabled(false);
-        m_pUi->sbCursorY1->setEnabled(true);
-    }
-    else
-    {
-        // XY axis change
-        qDebug() << "Cursor 1: XY axis change";
-        m_pUi->sbCursorX1->setEnabled(true);
-        m_pUi->sbCursorY1->setEnabled(true);
-    }
-}
-
-void MainWindow::on_cbCursor2_currentIndexChanged(int arg1)
-{
-    if (arg1 == 0)
-    {
-        // X axis change
-        qDebug() << "Cursor 1: X axis change";
-    }
-    else if (arg1 == 1)
-    {
-        // Y axis change
-        qDebug() << "Cursor 1: Y axis change";
-    }
-    else
-    {
-        // XY axis change
-        qDebug() << "Cursor 1: XY axis change";
-    }
-}
-
-void MainWindow::on_cbEscTemperature_stateChanged(int arg1)
-{
-    m_pChart->changeVisablilty(Port::TEMPERATURE, (bool)arg1);
-
-}
-
-void MainWindow::on_cbEscVoltage_stateChanged(int arg1)
-{
-    m_pChart->changeVisablilty(Port::VOLTAGE, (bool)arg1);
-}
-
-void MainWindow::on_cbEscCurrent_stateChanged(int arg1)
-{
-    m_pChart->changeVisablilty(Port::CURRENT, (bool)arg1);
-}
-
-void MainWindow::on_cbEscPower_stateChanged(int arg1)
-{
-    m_pChart->changeVisablilty(Port::CONSUMPTION, (bool)arg1);
-}
-
-void MainWindow::on_cbEscRpm_stateChanged(int arg1)
-{
-    m_pChart->changeVisablilty(Port::RPM, (bool)arg1);
-}
-
-
 
 

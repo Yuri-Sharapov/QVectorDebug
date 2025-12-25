@@ -47,7 +47,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4);
+    void on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4, short var5);
 
     void on_btnConnect_clicked();
     void on_btnSend_clicked();
@@ -64,21 +64,8 @@ private slots:
     void on_actionBlack_toggled(bool arg1);
     void on_actionWhite_toggled(bool arg1);
 
-    void on_actionUartVector_toggled(bool arg1);
-    void on_actionFEsc_toggled(bool arg1);
-
-    void on_actionC1_toggled(bool arg1);
-    void on_actionC2_toggled(bool arg1);
-
-    void on_cbCursor1_currentIndexChanged(int arg1);
-    void on_cbCursor2_currentIndexChanged(int arg1);
-
-    void on_cbEscTemperature_stateChanged(int arg1);
-    void on_cbEscVoltage_stateChanged(int arg1);
-    void on_cbEscCurrent_stateChanged(int arg1);
-    void on_cbEscPower_stateChanged(int arg1);
-    void on_cbEscRpm_stateChanged(int arg1);
-
+    void on_actionV1_toggled(bool arg1);
+    void on_actionV2_toggled(bool arg1);
 private:
     void showStatusMessage(const QString &message);
 
@@ -99,7 +86,7 @@ private:
 
     QSettings*      m_pSettings;
     ThemeSelector   m_uiTheme = THEME_WHITE;
-    Port::ProcotolType  m_protocol = Port::TYPE_VECTOR;
+    Port::ProcotolType  m_protocol = Port::TYPE_V1;
 
     QPalette        m_paletteWhite;
     QPalette        m_paletteBlack;
