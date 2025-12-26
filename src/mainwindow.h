@@ -24,6 +24,7 @@
 #include <QElapsedTimer>
 
 #include "platform.h"
+#include "chart_variable.h"
 #include "chart_widget.h"
 #include "port.h"
 
@@ -83,6 +84,7 @@ private:
     Port*           m_pPort;
     ChartWidget*    m_pChart = nullptr;
     QLabel*         m_pStatus = nullptr;
+    ChartVariable*  m_pChartVal = nullptr;
 
     QSettings*      m_pSettings;
     ThemeSelector   m_uiTheme = THEME_WHITE;

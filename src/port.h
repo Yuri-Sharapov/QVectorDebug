@@ -113,7 +113,7 @@ public slots:
 
 private slots:
     void portReadyRead();
-
+    void process() {}
 signals:
     void finished();
     void updatePlot(qint64 timeNs, short var1, short var2, short var3, short var4, short var5);

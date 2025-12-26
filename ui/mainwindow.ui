@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1008</width>
-    <height>875</height>
+    <width>818</width>
+    <height>693</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -96,7 +96,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="gbSettings">
+         <widget class="QGroupBox" name="gbVariables">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -106,7 +106,7 @@
           <property name="title">
            <string>Variables</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <layout class="QVBoxLayout" name="layVariables">
            <property name="leftMargin">
             <number>3</number>
            </property>
@@ -336,26 +336,26 @@
              </property>
             </spacer>
            </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="gbSend">
+          <property name="title">
+           <string>Send</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout">
            <item>
-            <widget class="QGroupBox" name="gbSend">
-             <property name="title">
+            <widget class="QLineEdit" name="leSendVar_1"/>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="leSendVar_2"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnSend">
+             <property name="text">
               <string>Send</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <item>
-               <widget class="QLineEdit" name="leSendVar_1"/>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="leSendVar_2"/>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnSend">
-                <property name="text">
-                 <string>Send</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
             </widget>
            </item>
           </layout>
@@ -375,7 +375,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1008</width>
+     <width>818</width>
      <height>21</height>
     </rect>
    </property>

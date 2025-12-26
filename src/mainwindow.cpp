@@ -84,6 +84,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     serialSetup();
     restoreSettings();
+
+    m_pChartVal = new ChartVariable(this);
+    m_pUi->layVariables->addWidget(m_pChartVal);
 }
 
 MainWindow::~MainWindow()

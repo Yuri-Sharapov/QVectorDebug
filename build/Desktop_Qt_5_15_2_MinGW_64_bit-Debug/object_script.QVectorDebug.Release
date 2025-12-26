@@ -1,0 +1,14 @@
+release/qcustomplot.o
+release/chart_variable.o
+release/chart_widget.o
+release/color_circle_label.o
+release/mainwindow.o
+release/port.o
+release/main.o
+release/qrc_res.o
+release/moc_qcustomplot.o
+release/moc_chart_variable.o
+release/moc_chart_widget.o
+release/moc_color_circle_label.o
+release/moc_mainwindow.o
+release/moc_port.o
