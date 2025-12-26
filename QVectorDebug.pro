@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     libs/qcustomplot/qcustomplot.cpp \
+    src/app_palette.cpp \
     src/chart_variable.cpp \
     src/chart_widget.cpp \
     src/color_circle_label.cpp \
@@ -21,6 +22,7 @@ INCLUDEPATH += $$PWD/src/
 
 HEADERS += \
     libs/qcustomplot/qcustomplot.h \
+    src/app_palette.h \
     src/chart_variable.h \
     src/chart_widget.h \
     src/color_circle_label.h \

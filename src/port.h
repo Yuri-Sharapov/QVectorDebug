@@ -35,28 +35,9 @@ class Port : public QObject
         int16_t    data[4];
         uint8_t    checkSum;
     };
-
-    struct EscProtocolData
-    {
-        int8_t      temperature;    // in Celsius
-        int16_t     voltage;        // V / 100
-        int16_t     current;        // A / 1000;
-        int16_t     consumption;    // in 1mAh
-        int16_t     rpm;            // electrical RPM/100
-        uint8_t     crc;
-    };
 #pragma pack( pop )
 
 public:
-    enum EscProtocolGraphs
-    {
-        TEMPERATURE,
-        VOLTAGE,
-        CURRENT,
-        CONSUMPTION,
-        RPM
-    };
-
     struct ChartVar
     {
         uint64_t    timeNs;

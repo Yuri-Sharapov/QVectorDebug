@@ -24,6 +24,7 @@
 #include <QElapsedTimer>
 
 #include "platform.h"
+#include "app_palette.h"
 #include "chart_variable.h"
 #include "chart_widget.h"
 #include "port.h"
@@ -89,9 +90,7 @@ private:
     QSettings*      m_pSettings;
     ThemeSelector   m_uiTheme = THEME_WHITE;
     Port::ProcotolType  m_protocol = Port::TYPE_V1;
-
-    QPalette        m_paletteWhite;
-    QPalette        m_paletteBlack;
+    AppPalette*     m_pAppPalette = nullptr;
 
     uint64_t        m_lastTimeUpdate = 0;
 };

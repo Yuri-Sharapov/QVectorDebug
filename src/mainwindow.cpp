@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_pPort(new Port)
     , m_pChart(new ChartWidget)
     , m_pSettings(new QSettings("settings.ini",QSettings::IniFormat))
+    , m_pAppPalette(new AppPalette)
 {
     m_pUi->setupUi(this);
 
@@ -58,30 +59,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_pUi->leSendVar_1->setEnabled(true);
     m_pUi->leSendVar_2->setEnabled(true);
 
-    // connect tx thread
-    m_paletteWhite = qApp->palette();
-
-    m_paletteBlack.setColor(QPalette::Window,QColor(53,53,53));
-    m_paletteBlack.setColor(QPalette::WindowText,Qt::white);
-    m_paletteBlack.setColor(QPalette::Disabled,QPalette::WindowText,QColor(127,127,127));
-    m_paletteBlack.setColor(QPalette::Base,QColor(42,42,42));
-    m_paletteBlack.setColor(QPalette::AlternateBase,QColor(66,66,66));
-    m_paletteBlack.setColor(QPalette::ToolTipBase,Qt::white);
-    m_paletteBlack.setColor(QPalette::ToolTipText,Qt::white);
-    m_paletteBlack.setColor(QPalette::Text,Qt::white);
-    m_paletteBlack.setColor(QPalette::Disabled,QPalette::Text,QColor(127,127,127));
-    m_paletteBlack.setColor(QPalette::Dark,QColor(35,35,35));
-    m_paletteBlack.setColor(QPalette::Shadow,QColor(20,20,20));
-    m_paletteBlack.setColor(QPalette::Button,QColor(53,53,53));
-    m_paletteBlack.setColor(QPalette::ButtonText,Qt::white);
-    m_paletteBlack.setColor(QPalette::Disabled,QPalette::ButtonText,QColor(127,127,127));
-    m_paletteBlack.setColor(QPalette::BrightText,Qt::red);
-    m_paletteBlack.setColor(QPalette::Link,QColor(42,130,218));
-    m_paletteBlack.setColor(QPalette::Highlight,QColor(42,130,218));
-    m_paletteBlack.setColor(QPalette::Disabled,QPalette::Highlight,QColor(80,80,80));
-    m_paletteBlack.setColor(QPalette::HighlightedText,Qt::white);
-    m_paletteBlack.setColor(QPalette::Disabled,QPalette::HighlightedText,QColor(127,127,127));
-
     serialSetup();
     restoreSettings();
 
@@ -98,6 +75,7 @@ MainWindow::~MainWindow()
     delete m_pChart;
     delete m_pSettings;
     delete m_pStatus;
+    delete m_pChartVal;
 }
 
 void MainWindow::on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4, short var5)
@@ -350,7 +328,7 @@ void MainWindow::showStatusMessage(const QString &message)
 void MainWindow::restoreSettings()
 {
     if (!m_pSettings->contains("wnd/height"))
-        m_pSettings->setValue("wnd/high", this->height());
+        m_pSettings->setValue("wnd/height", this->height());
     if (!m_pSettings->contains("wnd/width"))
         m_pSettings->setValue("wnd/width", this->width());
     if (!m_pSettings->contains("wnd/maximized"))
@@ -359,7 +337,6 @@ void MainWindow::restoreSettings()
         m_pSettings->setValue("wnd/left_panel", m_pUi->splitter->saveState());
     if (!m_pSettings->contains("wnd/theme"))
         m_pSettings->setValue("wnd/theme", static_cast<int>(m_uiTheme));
-
     if (!m_pSettings->contains("port/protocol"))
         m_pSettings->setValue("port/protocol", static_cast<int>(m_pPort->getProtocolType()));
     if (!m_pSettings->contains("port/name"))
@@ -403,7 +380,7 @@ void MainWindow::saveSettings()
 {
     if (!isMaximized())
     {
-        m_pSettings->setValue("wnd/high", this->height());
+        m_pSettings->setValue("wnd/height", this->height());
         m_pSettings->setValue("wnd/width", this->width());
         m_pSettings->setValue("wnd/maximized", 0);
     }
@@ -428,7 +405,7 @@ void MainWindow::updateTheme()
         on_actionWhite_toggled(true);
 
         qApp->setStyle(QStyleFactory::create("Fusion"));
-        qApp->setPalette(m_paletteWhite);
+        qApp->setPalette(m_pAppPalette->getWhitePalette());
 
         m_pChart->setThemeBackground(Qt::white);
     }
@@ -437,7 +414,7 @@ void MainWindow::updateTheme()
         on_actionBlack_toggled(true);
 
         qApp->setStyle(QStyleFactory::create("Fusion"));
-        qApp->setPalette(m_paletteBlack);
+        qApp->setPalette(m_pAppPalette->getBlackPalette());
 
         m_pChart->setThemeBackground(Qt::black);
     }
