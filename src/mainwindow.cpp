@@ -30,11 +30,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_pChart->setObjectName(QString::fromUtf8("wgtChart"));
     m_pUi->layChart->addWidget(m_pChart);
 
-    m_pUi->cbEnabled_1->setChecked(false);
-    m_pUi->cbEnabled_2->setChecked(false);
-    m_pUi->cbEnabled_3->setChecked(false);
-    m_pUi->cbEnabled_4->setChecked(false);
-
     // create tight thread
     QThread *threadNew = new QThread;
     // move class to new thread
@@ -52,18 +47,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     // disable unused
     m_pUi->btnSend->setEnabled(true);
-    m_pUi->cbSign_1->setEnabled(false);
-    m_pUi->cbSign_2->setEnabled(false);
-    m_pUi->cbSign_3->setEnabled(false);
-    m_pUi->cbSign_4->setEnabled(false);
     m_pUi->leSendVar_1->setEnabled(true);
     m_pUi->leSendVar_2->setEnabled(true);
 
     serialSetup();
     restoreSettings();
 
-    m_pChartVal = new ChartVariable(this);
-    m_pUi->layVariables->addWidget(m_pChartVal);
+    for (int i = 0; i < 4; i++)
+    {
+        ChartVariable* pVal = new ChartVariable(this);
+        m_chartVals.push_back(pVal);
+        m_pUi->verticalLayout_3->addWidget(pVal);
+        pVal->setColor(g_defaultColors.at(i));
+        connect(pVal, &ChartVariable::stateChanged, this, &MainWindow::onChartStateChanged);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -75,7 +72,8 @@ MainWindow::~MainWindow()
     delete m_pChart;
     delete m_pSettings;
     delete m_pStatus;
-    delete m_pChartVal;
+    for (auto chartVal : m_chartVals)
+        delete chartVal;
 }
 
 void MainWindow::on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4, short var5)
@@ -97,38 +95,6 @@ void MainWindow::on_btnConnect_clicked()
         serialConnect();
         m_pChart->startChart();
     }
-}
-
-void MainWindow::on_cbEnabled_1_stateChanged(int arg1)
-{
-    if (arg1 == 2)
-        m_pChart->changeVisablilty(0, true);
-    else
-        m_pChart->changeVisablilty(0, false);
-}
-
-void MainWindow::on_cbEnabled_2_stateChanged(int arg1)
-{
-    if (arg1 == 2)
-        m_pChart->changeVisablilty(1, true);
-    else
-        m_pChart->changeVisablilty(1, false);
-}
-
-void MainWindow::on_cbEnabled_3_stateChanged(int arg1)
-{
-    if (arg1 == 2)
-        m_pChart->changeVisablilty(2, true);
-    else
-        m_pChart->changeVisablilty(2, false);
-}
-
-void MainWindow::on_cbEnabled_4_stateChanged(int arg1)
-{
-    if (arg1 == 2)
-        m_pChart->changeVisablilty(3, true);
-    else
-        m_pChart->changeVisablilty(3, false);
 }
 
 void MainWindow::on_btnSend_clicked()
@@ -159,6 +125,19 @@ void MainWindow::on_btnSend_clicked()
     dataToSend.append(chkSum);
 
     m_pPort->write(dataToSend);
+}
+
+void MainWindow::onChartStateChanged(int arg)
+{
+    ChartVariable* source = qobject_cast<ChartVariable*>(sender());
+    for (int i = 0; i < m_chartVals.size(); i++)
+    {
+        if (m_chartVals.at(i) == source)
+        {
+            qDebug() << "change visability of " << i << "graph";
+            m_pChart->changeVisablilty(i, arg == 2 ? true : false);
+        }
+    }
 }
 
 void MainWindow::on_actionExit_triggered()

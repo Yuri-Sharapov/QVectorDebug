@@ -14,3 +14,8 @@ ChartVariable::~ChartVariable()
 {
     delete ui;
 }
+
+void ChartVariable::setColor(const QColor &color)
+{
+    ui->lblColor->setColor(color);
+}

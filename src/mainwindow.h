@@ -33,6 +33,42 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+static const QVector<QColor> g_defaultColors =
+    {
+        QColor(255, 0, 0),       // Red
+        QColor(0, 128, 0),       // Dark Green
+        QColor(0, 0, 255),       // Blue
+        QColor(255, 165, 0),     // Orange
+        QColor(128, 0, 128),     // Purple
+        QColor(0, 206, 209),     // Dark Turquoise
+        QColor(255, 105, 180),   // Hot Pink
+        QColor(160, 82, 45),     // Sienna
+        QColor(0, 255, 127),     // Spring Green
+        QColor(255, 255, 0),     // Yellow
+        QColor(70, 130, 180),    // Steel Blue
+        QColor(199, 21, 133),    // Medium Violet Red
+        QColor(255, 20, 147),    // Deep Pink
+        QColor(105, 105, 105),   // Dim Gray
+        QColor(255, 140, 0),     // Dark Orange
+        QColor(72, 209, 204),    // Medium Turquoise
+        QColor(138, 43, 226),    // Blue Violet
+        QColor(60, 179, 113),    // Medium Sea Green
+        QColor(255, 99, 71),     // Tomato
+        QColor(47, 79, 79),      // Dark Slate Gray
+        QColor(0, 191, 255),     // Deep Sky Blue
+        QColor(127, 255, 0),     // Chartreuse
+        QColor(186, 85, 211),    // Medium Orchid
+        QColor(244, 164, 96),    // Sandy Brown
+        QColor(95, 158, 160),    // Cadet Blue
+        QColor(255, 228, 181),   // Moccasin
+        QColor(100, 149, 237),   // Cornflower Blue
+        QColor(255, 215, 0),     // Gold
+        QColor(189, 183, 107),   // Dark Khaki
+        QColor(152, 251, 152),   // Pale Green
+        QColor(123, 104, 238),   // Medium Slate Blue
+        QColor(219, 112, 147)    // Pale Violet Red
+};
+
 
 class MainWindow : public QMainWindow
 {
@@ -54,10 +90,7 @@ private slots:
     void on_btnConnect_clicked();
     void on_btnSend_clicked();
 
-    void on_cbEnabled_1_stateChanged(int arg1);
-    void on_cbEnabled_2_stateChanged(int arg1);
-    void on_cbEnabled_3_stateChanged(int arg1);
-    void on_cbEnabled_4_stateChanged(int arg1);
+    void onChartStateChanged(int arg);
 
     void on_actionExit_triggered();
     void on_actionSave_triggered();
@@ -85,7 +118,7 @@ private:
     Port*           m_pPort;
     ChartWidget*    m_pChart = nullptr;
     QLabel*         m_pStatus = nullptr;
-    ChartVariable*  m_pChartVal = nullptr;
+    QVector<ChartVariable*> m_chartVals;
 
     QSettings*      m_pSettings;
     ThemeSelector   m_uiTheme = THEME_WHITE;

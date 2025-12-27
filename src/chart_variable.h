@@ -14,6 +14,7 @@ class ChartVariable : public QWidget
 public:
     explicit ChartVariable(QWidget *parent = nullptr);
     ~ChartVariable();
+    void setColor(const QColor& color);
 signals:
     void stateChanged(int arg1);
     void colorChanged(const QColor& newColor);
