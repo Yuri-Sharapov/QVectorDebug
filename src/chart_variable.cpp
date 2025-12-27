@@ -19,3 +19,8 @@ void ChartVariable::setColor(const QColor &color)
 {
     ui->lblColor->setColor(color);
 }
+
+void ChartVariable::setName(const QString &name)
+{
+    ui->leName->setText(name);
+}

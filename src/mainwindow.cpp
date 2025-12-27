@@ -53,12 +53,14 @@ MainWindow::MainWindow(QWidget *parent)
     serialSetup();
     restoreSettings();
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 8; i++)
     {
         ChartVariable* pVal = new ChartVariable(this);
         m_chartVals.push_back(pVal);
         m_pUi->verticalLayout_3->addWidget(pVal);
         pVal->setColor(g_defaultColors.at(i));
+        QString name = "var_" + QString::number(i + 1);
+        pVal->setName(name);
         connect(pVal, &ChartVariable::stateChanged, this, &MainWindow::onChartStateChanged);
     }
 }

@@ -38,7 +38,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QLineEdit" name="leNAme"/>
+      <widget class="QLineEdit" name="leName"/>
      </item>
     </layout>
    </item>
