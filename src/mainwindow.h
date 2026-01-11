@@ -27,6 +27,7 @@
 #include "app_palette.h"
 #include "chart_variable.h"
 #include "chart_widget.h"
+#include "libs/cli_wgt/cli_wgt.h"
 #include "port.h"
 
 QT_BEGIN_NAMESPACE
@@ -85,7 +86,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4, short var5);
+    void on_PortUpdatePlot(int var1, int var2, int var3, int var4, int var5, int var6);
 
     void on_btnConnect_clicked();
     void on_btnSend_clicked();
@@ -102,6 +103,8 @@ private slots:
     void on_actionV1_toggled(bool arg1);
     void on_actionV2_toggled(bool arg1);
 private:
+    void showEvent(QShowEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event);
     void showStatusMessage(const QString &message);
 
     void serialSetup(void);
@@ -118,6 +121,7 @@ private:
     Port*           m_pPort;
     ChartWidget*    m_pChart = nullptr;
     QLabel*         m_pStatus = nullptr;
+    cli_wgt*        m_pCliWgt = nullptr;
     QVector<ChartVariable*> m_chartVals;
 
     QSettings*      m_pSettings;
@@ -126,5 +130,6 @@ private:
     AppPalette*     m_pAppPalette = nullptr;
 
     uint64_t        m_lastTimeUpdate = 0;
+     QElapsedTimer  m_updateTimer;
 };
 #endif // MAINWINDOW_H

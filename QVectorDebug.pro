@@ -9,7 +9,10 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    libs/cli_wgt/cli_wgt.cpp \
     libs/qcustomplot/qcustomplot.cpp \
+    libs/mcdbg/cobs.c \
+    libs/mcdbg/mcdbg_pc.c \
     src/app_palette.cpp \
     src/chart_variable.cpp \
     src/chart_widget.cpp \
@@ -21,7 +24,10 @@ SOURCES += \
 INCLUDEPATH += $$PWD/src/
 
 HEADERS += \
+    libs/cli_wgt/cli_wgt.h \
     libs/qcustomplot/qcustomplot.h \
+    libs/mcdbg/cobs.h \
+    libs/mcdbg/mcdbg_pc.h \
     src/app_palette.h \
     src/chart_variable.h \
     src/chart_widget.h \

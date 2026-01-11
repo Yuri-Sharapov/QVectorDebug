@@ -30,17 +30,23 @@ MainWindow::MainWindow(QWidget *parent)
     m_pChart->setObjectName(QString::fromUtf8("wgtChart"));
     m_pUi->layChart->addWidget(m_pChart);
 
+    m_pCliWgt = new cli_wgt(this);
+    m_pUi->layTerminal->addWidget(m_pCliWgt);
+    m_pUi->splitter_2->setSizes({1, 0});
     // create tight thread
     QThread *threadNew = new QThread;
     // move class to new thread
-    m_pPort->moveToThread(threadNew);
+    //m_pPort->moveToThread(threadNew);
     // move port to thread
     m_pPort->m_port.moveToThread(threadNew);
-    connect(threadNew, SIGNAL(started()), m_pPort, SLOT(process()));
-    connect(m_pPort, SIGNAL(finished()), threadNew, SLOT(quit()));
+    connect(threadNew, &QThread::started, m_pPort, &Port::process);
+    connect(m_pPort, &Port::finished, threadNew, &QThread::quit);
+    connect(m_pPort, &Port::cliRx, m_pCliWgt, &cli_wgt::receiveData);
+    connect(m_pCliWgt, &cli_wgt::dataReceived, m_pPort, &Port::cliTx);
     connect(m_pPort, &Port::updatePlot, this, &MainWindow::on_PortUpdatePlot);
     // run new thread
     threadNew->start();
+    m_updateTimer.start();
 
     m_pStatus = new QLabel(this);
     m_pUi->statusbar->addWidget(m_pStatus);
@@ -53,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
     serialSetup();
     restoreSettings();
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 6; i++)
     {
         ChartVariable* pVal = new ChartVariable(this);
         m_chartVals.push_back(pVal);
@@ -63,6 +69,8 @@ MainWindow::MainWindow(QWidget *parent)
         pVal->setName(name);
         connect(pVal, &ChartVariable::stateChanged, this, &MainWindow::onChartStateChanged);
     }
+
+    qApp->installEventFilter(this);
 }
 
 MainWindow::~MainWindow()
@@ -70,7 +78,6 @@ MainWindow::~MainWindow()
     saveSettings();
 
     delete m_pUi;
-    delete m_pPort;
     delete m_pChart;
     delete m_pSettings;
     delete m_pStatus;
@@ -78,16 +85,36 @@ MainWindow::~MainWindow()
         delete chartVal;
 }
 
-void MainWindow::on_PortUpdatePlot(qint64 timeNs, short var1, short var2, short var3, short var4, short var5)
+void MainWindow::showEvent(QShowEvent *event)
 {
-    Q_UNUSED(timeNs);
-    m_pChart->addVectorDataRelative(var1, var2, var3, var4);
-    m_pChart->updateChart();
+    QMainWindow::showEvent(event);
+
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::Wheel)
+    {
+        if (qobject_cast<QComboBox*>(obj))
+            return true;
+    }
+    return QObject::eventFilter(obj, event);
+}
+
+void MainWindow::on_PortUpdatePlot(int var1, int var2, int var3, int var4, int var5, int var6)
+{
+    //m_pChart->addVectorDataRelative(var1, var2, var3, var4);
+    m_pChart->addData(var1, var2, var3, var4, var5, var6);
+    if (m_updateTimer.elapsed() > 200)
+    {
+        m_pChart->updateChart();
+        m_updateTimer.restart();
+    }
 }
 
 void MainWindow::on_btnConnect_clicked()
 {
-    if (m_pPort->isOpenPort())
+    if (m_pPort->isPortOpen())
     {
         serialDisconnect();
         openChart(m_pPort->getChartVars());
@@ -149,7 +176,7 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionSave_triggered()
 {
-    if (m_pPort->getChartVars()->count() && !m_pPort->isOpenPort())
+    if (m_pPort->getChartVars()->count() && !m_pPort->isPortOpen())
     {
         QDateTime currentDateTime = QDateTime::currentDateTime();
         QString data = "QVector-";
@@ -276,28 +303,13 @@ void MainWindow::openChart(QVector<Port::ChartVar> *pVars)
 
     for(int i = 0; i < pVars->size(); i++)
     {
-        //if (timePrevNs == 0)
-        //{
-        //    timePrevNs = var.timeNs;
-        //    m_pChart->appendData(var.timeNs, var.data[0], var.data[1], var.data[2], var.data[3]);
-        //}
-        //else
-        //{
-        //    if (timePrevNs/1000000U != var.timeNs/1000000U)
-        //        m_pChart->appendData(var.timeNs, var.data[0], var.data[1], var.data[2], var.data[3]);
-//
-        //    timePrevNs = var.timeNs;
-        //}
         if (m_protocol == Port::TYPE_V1)
             m_pChart->addVectorDataRelative(pVars->at(i).data[0], pVars->at(i).data[1], pVars->at(i).data[2], pVars->at(i).data[3]);
         else
         {
-            m_pChart->addEscDataRelative(pVars->at(i).data[0], pVars->at(i).data[1], pVars->at(i).data[2], pVars->at(i).data[3], pVars->at(i).data[4]);
+
         }
     }
-
-
-
     m_pChart->updateChart();
 }
 

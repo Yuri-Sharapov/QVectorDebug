@@ -24,34 +24,16 @@
 class ChartWidget : public QCustomPlot
 {
     Q_OBJECT
-    const size_t GRAPH_COUNT = 5;
-    const QColor GRAPH_COLORS[5] =
+    const size_t GRAPH_COUNT = 6;
+    const QColor GRAPH_COLORS[6] =
     {
-        Qt::GlobalColor::red,
-        Qt::GlobalColor::blue,
-        Qt::GlobalColor::green,
-        Qt::GlobalColor::yellow,
-        Qt::GlobalColor::cyan
+        QColor(255, 0, 0),       // Red
+        QColor(0, 128, 0),       // Dark Green
+        QColor(0, 0, 255),       // Blue
+        QColor(255, 165, 0),     // Orange
+        QColor(128, 0, 128),     // Purple
+        QColor(0, 206, 209)
     };
-
-    const char* GRAPH_NAMES[5] =
-    {
-        "Temperature",
-        "Voltage",
-        "Current",
-        "Consumption",
-        "RPM"
-    };
-
-    enum GraphNames
-    {
-        TEMPERATURE = 0,
-        VOLTAGE = 1,
-        CURRENT = 2,
-        CONSUMPTION = 3,
-        RPM = 4
-    };
-
 public:
     ChartWidget(QCustomPlot *parent = 0);
     ~ChartWidget();
@@ -59,8 +41,7 @@ public:
     void addVectorData(qint64 time, int data0, int data1, int data2, int data3);
     void addVectorDataRelative(int data0, int data1, int data2, int data3);
 
-    void addEscData(qint64 time, int temp, int voltage, int current, int consumption, int rpm);
-    void addEscDataRelative(int temp, int voltage, int current, int consumption, int rpm);
+    void addData(int v1, int v2, int v3, int v4, int v5, int v6);
 
     void startChart(void);
     void updateChart(void);

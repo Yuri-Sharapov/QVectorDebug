@@ -22,6 +22,8 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 
+#include "libs/mcdbg/mcdbg_pc.h"
+
 #define PROTOCOL_START_BYTE     0x55
 #define GUI_UPDATE_PERIOD_MS    100
 
@@ -41,7 +43,7 @@ public:
     struct ChartVar
     {
         uint64_t    timeNs;
-        int16_t     data[14];
+        int16_t     data[16];
     };
 
     enum ProcotolType
@@ -50,66 +52,49 @@ public:
         TYPE_V2 = 1
     };
 
-    enum RxState
-    {
-        STATE_WAIT,
-        STATE_DATA_STD,
-        STATE_DATA_EXT,
-        STATE_CRC
-    };
-
     explicit Port(QObject *parent = 0);
     ~Port();
 
     bool openPort(long _baudrate, QString _name);
     void closePort();
-
-    bool isOpenPort(void)
+    bool isPortOpen(void)
     {
         return m_port.isOpen();
     }
-
     QVector<ChartVar>* getChartVars(void)
     {
         return &m_rxRawData;
     }
-
     int getErrorsCnt(void)
     {
         return m_errorsCnt;
     }
-
     void setProtocolType(ProcotolType type)
     {
         m_currentProtocolType = type;
     }
-
     ProcotolType getProtocolType(void)
     {
         return m_currentProtocolType;
     }
-
 public slots:
     void write(const QByteArray &data);
-
+    void process() {}
+    void cliTx(const QByteArray &array);
 private slots:
     void portReadyRead();
-    void process() {}
 signals:
     void finished();
-    void updatePlot(qint64 timeNs, short var1, short var2, short var3, short var4, short var5);
-
+    void updatePlot(int v1, int v2, int v3, int v4, int v5, int v6);
+    void cliRx(const QByteArray &array);
 private:
     void protocolParseData(const QByteArray &data);
-    void protocolParseFEsc(const QByteArray &data);
-
+    void protocolParseMcdbg(const QByteArray &data);
 public:
     QSerialPort         m_port;
-
 private:
     uint32_t            m_baudrate;
     QString             m_name;
-
     QByteArray          m_rxData;
     QVector<ChartVar>   m_rxRawData;
     QElapsedTimer       m_timerNs;

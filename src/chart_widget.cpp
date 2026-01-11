@@ -47,22 +47,14 @@ void ChartWidget::addVectorDataRelative(int data0, int data1, int data2, int dat
     m_timeStep++;
 }
 
-void ChartWidget::addEscData(qint64 time, int temp, int voltage, int current, int consumption, int rpm)
+void ChartWidget::addData(int v1, int v2, int v3, int v4, int v5, int v6)
 {
-    graph(0)->addData(static_cast<double>(time) / 1000000.0, static_cast<double>(temp));
-    graph(1)->addData(static_cast<double>(time) / 1000000.0, static_cast<double>(voltage));
-    graph(2)->addData(static_cast<double>(time) / 1000000.0, static_cast<double>(current));
-    graph(3)->addData(static_cast<double>(time) / 1000000.0, static_cast<double>(consumption));
-    graph(4)->addData(static_cast<double>(time) / 1000000.0, static_cast<double>(rpm));
-}
-
-void ChartWidget::addEscDataRelative(int temp, int voltage, int current, int consumption, int rpm)
-{
-    graph(TEMPERATURE)->addData(m_timeStep, static_cast<double>(temp));
-    graph(VOLTAGE)->addData(m_timeStep, static_cast<double>(voltage));
-    graph(CURRENT)->addData(m_timeStep, static_cast<double>(current));
-    graph(CONSUMPTION)->addData(m_timeStep, static_cast<double>(consumption));
-    graph(RPM)->addData(m_timeStep, static_cast<double>(rpm));
+    graph(0)->addData(m_timeStep, static_cast<double>(v1));
+    graph(1)->addData(m_timeStep, static_cast<double>(v2));
+    graph(2)->addData(m_timeStep, static_cast<double>(v3));
+    graph(3)->addData(m_timeStep, static_cast<double>(v4));
+    graph(4)->addData(m_timeStep, static_cast<double>(v5));
+    graph(5)->addData(m_timeStep, static_cast<double>(v6));
     m_timeStep++;
 }
 
@@ -121,56 +113,6 @@ void ChartWidget::setThemeBackground(const QColor &brush)
 
 
     this->replot();
-}
-
-void ChartWidget::enableCursor(bool enable)
-{
-    m_cursorEnable = enable;
-
-    if (enable)
-    {
-        m_hCursor = new QCPItemLine(this);
-        m_vCursor = new QCPItemLine(this);
-
-        m_hCursor->setPen(m_cursorColor);
-        m_vCursor->setPen(m_cursorColor);
-
-        m_hCursor->start->setCoords(-QCPRange::maxRange, m_vPos);
-        m_hCursor->end->setCoords(QCPRange::maxRange, m_vPos);
-
-        m_vCursor->start->setCoords(m_hPos,  -QCPRange::maxRange);
-        m_vCursor->end->setCoords(m_hPos, QCPRange::maxRange);
-    }
-    else
-    {
-        removeItem(m_hCursor);
-        removeItem(m_vCursor);
-    }
-
-    this->replot();
-
-}
-
-void ChartWidget::setVCursor(int position)
-{
-    m_vPos = position;
-
-    if (m_cursorEnable)
-    {
-        enableCursor(false);
-        enableCursor(true);
-    }
-}
-
-void ChartWidget::setHCursor(int position)
-{
-    m_hPos = position;
-
-    if (m_cursorEnable)
-    {
-        enableCursor(false);
-        enableCursor(true);
-    }
 }
 
 void ChartWidget::changeVisablilty(int graph, bool state)
