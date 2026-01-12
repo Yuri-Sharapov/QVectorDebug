@@ -1,5 +1,3 @@
-Вот расширенная и структурированная версия документации в формате Markdown с добавленным вступлением и схемой буферизации, чтобы инженеру было удобно реализовать свой клиент.
-
 # VectorDebug USB Data Protocol and Debug Method
 
 **VectorDebug** is a software tool designed for **debugging ESCs and motor controllers** operating in **sensorless or field-oriented control (FOC) mode**, where **high-frequency data acquisition** from the controller is required (up to **10–20 kHz**). It allows real-time capture and transmission of debug variables and CLI messages over **SPI → Blackpill → USB**.
